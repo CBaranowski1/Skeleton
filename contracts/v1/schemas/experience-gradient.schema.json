@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/experience-gradient.schema.json",
+  "title": "Skeleton Experience Gradient v1",
+  "description": "The closed domain-neutral PLT-02 learning record for exactly one completed attempt: objective, pre-action prediction, retrieved evidence identities, ordinal-keyed actions, verifier results, closed outcome, seven-counter integer costs, causal credit over listed action ordinals, repaired-or-counterfactual trajectory, and permitted learning targets; raw prompts, transcripts, scratchpads, hidden chain-of-thought, floats, and wall-clock members are unrepresentable by shape, and an unresolved outcome cannot permit the fast_weights channel.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE13_GRADIENT",
+  "x-skeleton-identity-rule": "gradient_id = framed sha256 over JCS canonical bytes of the document with the gradient_id member removed, under domain SKELETON_PHASE13_GRADIENT",
+  "x-skeleton-sorted-inventories": ["retrieved_evidence_ids", "actions.action_ordinal", "causal_credit.action_ordinal", "permitted_learning_targets"],
+  "x-skeleton-cross-field": [
+    "every causal_credit.action_ordinal MUST name an action_ordinal listed in actions",
+    "no verifier_results.verifier_organ may equal producer_organ (producer/grader separation, D-08)"
+  ],
+  "$defs": {
+    "learningChannel": {
+      "enum": [
+        "fast_weights",
+        "uncertainty",
+        "retrieval",
+        "routing",
+        "experiment_selection"
+      ]
+    },
+    "nonFactualChannel": {
+      "enum": [
+        "uncertainty",
+        "retrieval",
+        "routing",
+        "experiment_selection"
+      ]
+    },
+    "scopeBinding": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scope_kind"],
+          "properties": {
+            "scope_kind": {
+              "enum": ["kernel", "identity", "lobe_coding", "lobe_trading", "lobe_research"]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scope_kind", "project_id"],
+          "properties": {
+            "scope_kind": {"const": "project"},
+            "project_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+          }
+        }
+      ]
+    },
+    "boundedText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "absentText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["present"],
+      "properties": {
+        "present": {"const": false}
+      }
+    },
+    "presentText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["present", "text"],
+      "properties": {
+        "present": {"const": true},
+        "text": {"$ref": "#/$defs/boundedText"}
+      }
+    },
+    "optionalText": {
+      "oneOf": [
+        {"$ref": "#/$defs/absentText"},
+        {"$ref": "#/$defs/presentText"}
+      ]
+    },
+    "actionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_ordinal", "description", "tool_evidence_id"],
+      "properties": {
+        "action_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "description": {"$ref": "#/$defs/boundedText"},
+        "tool_evidence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"}
+      }
+    },
+    "verifierResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verifier_organ", "verdict", "receipt_id"],
+      "properties": {
+        "verifier_organ": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/organ"},
+        "verdict": {"enum": ["passed", "failed", "not_evaluated"]},
+        "receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+      }
+    },
+    "causalCreditEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_ordinal", "credit_permille"],
+      "properties": {
+        "action_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "credit_permille": {"type": "integer", "minimum": 0, "maximum": 1000}
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "schema_domain",
+    "gradient_id",
+    "scope",
+    "objective",
+    "pre_action_prediction",
+    "retrieved_evidence_ids",
+    "actions",
+    "verifier_results",
+    "outcome",
+    "costs",
+    "causal_credit",
+    "repaired_or_counterfactual_trajectory",
+    "permitted_learning_targets",
+    "producer_organ",
+    "attempt_ordinal"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.experience-gradient.v1"},
+    "record_type": {"const": "experience_gradient"},
+    "schema_domain": {"const": "SKELETON_PHASE13_GRADIENT"},
+    "gradient_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "scope": {"$ref": "#/$defs/scopeBinding"},
+    "objective": {"$ref": "#/$defs/boundedText"},
+    "pre_action_prediction": {"$ref": "#/$defs/optionalText"},
+    "retrieved_evidence_ids": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/hashInventory"},
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "action_ordinal_ascending",
+      "x-skeleton-unique-fields": [["action_ordinal"]],
+      "items": {"$ref": "#/$defs/actionEntry"}
+    },
+    "verifier_results": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "agent_organ_canonical_order",
+      "items": {"$ref": "#/$defs/verifierResult"}
+    },
+    "outcome": {"enum": ["success", "failure", "unresolved"]},
+    "costs": {"$ref": "https://schemas.skeleton.local/v1/agent-budget.schema.json#/$defs/budgetVector"},
+    "causal_credit": {
+      "type": "array",
+      "maxItems": 256,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "action_ordinal_ascending",
+      "x-skeleton-unique-fields": [["action_ordinal"]],
+      "items": {"$ref": "#/$defs/causalCreditEntry"}
+    },
+    "repaired_or_counterfactual_trajectory": {"$ref": "#/$defs/optionalText"},
+    "permitted_learning_targets": {
+      "type": "array",
+      "maxItems": 5,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "learning_channel_canonical_order",
+      "items": {"$ref": "#/$defs/learningChannel"}
+    },
+    "producer_organ": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/organ"},
+    "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"}
+  },
+  "oneOf": [
+    {
+      "x-skeleton-branch": "resolved_outcome",
+      "properties": {
+        "outcome": {"enum": ["success", "failure"]},
+        "pre_action_prediction": {"$ref": "#/$defs/presentText"},
+        "verifier_results": {"minItems": 1}
+      }
+    },
+    {
+      "x-skeleton-branch": "unresolved_outcome_nonfactual_targets_only",
+      "properties": {
+        "outcome": {"const": "unresolved"},
+        "permitted_learning_targets": {
+          "maxItems": 4,
+          "items": {"$ref": "#/$defs/nonFactualChannel"}
+        }
+      }
+    }
+  ]
+}

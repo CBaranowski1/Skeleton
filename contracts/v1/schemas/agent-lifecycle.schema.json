@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/agent-lifecycle.schema.json",
+  "title": "Skeleton Fenced Append-Only Agent Lifecycle v1",
+  "description": "An acyclic generation-fenced invocation event or deterministic event ledger with explicit terminal and abandoned outcomes.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-no-post-terminal": true,
+  "$defs": {
+    "state": {
+      "enum": ["received", "running", "awaiting_falsification", "recovering", "terminal", "abandoned"]
+    },
+    "priorState": {
+      "enum": ["none", "received", "running", "awaiting_falsification", "recovering"]
+    },
+    "reason": {
+      "enum": [
+        "invocation_received",
+        "dispatch_started",
+        "candidate_requires_falsification",
+        "recovery_takeover",
+        "resumed_under_fresh_fence",
+        "result_committed",
+        "recovered_result_committed",
+        "model_timeout",
+        "cancelled",
+        "budget_exhausted",
+        "stale_fence",
+        "unrecoverable_crash",
+        "invalid_result"
+      ]
+    },
+    "eventCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-skeleton-distinct-fields": [["lifecycle_event_id", "prior_event_id"]],
+      "required": [
+        "schema_version",
+        "record_type",
+        "lifecycle_event_id",
+        "invocation_id",
+        "event_ordinal",
+        "prior_event_id",
+        "prior_state",
+        "state",
+        "attempt",
+        "coordinator_generation",
+        "fence_id",
+        "reason",
+        "recovery_disposition",
+        "terminal_result_id",
+        "terminal_result_root",
+        "recorded_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.agent-lifecycle.v1"},
+        "record_type": {"const": "lifecycle_event"},
+        "lifecycle_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "event_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "prior_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "prior_state": {"$ref": "#/$defs/priorState"},
+        "state": {"$ref": "#/$defs/state"},
+        "attempt": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "coordinator_generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "reason": {"$ref": "#/$defs/reason"},
+        "recovery_disposition": {"enum": ["none", "resume_pending", "resumed", "abandoned"]},
+        "terminal_result_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "terminal_result_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "recorded_at": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/utcTimestamp"}
+      }
+    },
+    "receivedEvent": {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "properties": {
+            "event_ordinal": {"const": 0},
+            "prior_event_id": {"const": "none"},
+            "prior_state": {"const": "none"},
+            "state": {"const": "received"},
+            "reason": {"const": "invocation_received"},
+            "recovery_disposition": {"const": "none"},
+            "terminal_result_id": {"const": "none"},
+            "terminal_result_root": {"const": "none"}
+          }
+        }
+      ]
+    },
+    "runningEvent": {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "properties": {
+            "event_ordinal": {"minimum": 1},
+            "prior_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "state": {"const": "running"},
+            "terminal_result_id": {"const": "none"},
+            "terminal_result_root": {"const": "none"}
+          },
+          "oneOf": [
+            {
+              "properties": {
+                "prior_state": {"const": "received"},
+                "reason": {"const": "dispatch_started"},
+                "recovery_disposition": {"const": "none"}
+              }
+            },
+            {
+              "properties": {
+                "prior_state": {"const": "recovering"},
+                "reason": {"const": "resumed_under_fresh_fence"},
+                "recovery_disposition": {"const": "resumed"}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "falsificationEvent": {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "properties": {
+            "event_ordinal": {"minimum": 1},
+            "prior_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "prior_state": {"const": "running"},
+            "state": {"const": "awaiting_falsification"},
+            "reason": {"const": "candidate_requires_falsification"},
+            "recovery_disposition": {"const": "none"},
+            "terminal_result_id": {"const": "none"},
+            "terminal_result_root": {"const": "none"}
+          }
+        }
+      ]
+    },
+    "recoveryEvent": {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "properties": {
+            "event_ordinal": {"minimum": 1},
+            "prior_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "prior_state": {"enum": ["received", "running", "awaiting_falsification"]},
+            "state": {"const": "recovering"},
+            "reason": {"const": "recovery_takeover"},
+            "recovery_disposition": {"const": "resume_pending"},
+            "terminal_result_id": {"const": "none"},
+            "terminal_result_root": {"const": "none"}
+          }
+        }
+      ]
+    },
+    "terminalEvent": {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "properties": {
+            "event_ordinal": {"minimum": 1},
+            "prior_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "prior_state": {"enum": ["running", "awaiting_falsification", "recovering"]},
+            "state": {"const": "terminal"},
+            "reason": {"enum": ["result_committed", "recovered_result_committed"]},
+            "recovery_disposition": {"enum": ["none", "resumed"]},
+            "terminal_result_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "terminal_result_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+          }
+        }
+      ]
+    },
+    "abandonedEvent": {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "properties": {
+            "event_ordinal": {"minimum": 1},
+            "prior_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "prior_state": {"enum": ["received", "running", "awaiting_falsification", "recovering"]},
+            "state": {"const": "abandoned"},
+            "reason": {"enum": ["model_timeout", "cancelled", "budget_exhausted", "stale_fence", "unrecoverable_crash", "invalid_result"]},
+            "recovery_disposition": {"const": "abandoned"},
+            "terminal_result_id": {"const": "none"},
+            "terminal_result_root": {"const": "none"}
+          }
+        }
+      ]
+    },
+    "lifecycleEvent": {
+      "oneOf": [
+        {"$ref": "#/$defs/receivedEvent"},
+        {"$ref": "#/$defs/runningEvent"},
+        {"$ref": "#/$defs/falsificationEvent"},
+        {"$ref": "#/$defs/recoveryEvent"},
+        {"$ref": "#/$defs/terminalEvent"},
+        {"$ref": "#/$defs/abandonedEvent"}
+      ]
+    },
+    "lifecycleLedger": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-skeleton-sorted-inventories": ["events.event_ordinal"],
+      "x-skeleton-exact-counters": [["event_count", "events"]],
+      "required": [
+        "schema_version",
+        "record_type",
+        "invocation_id",
+        "lifecycle_root",
+        "events",
+        "event_count",
+        "terminal_event_count",
+        "disposition"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.agent-lifecycle.v1"},
+        "record_type": {"const": "lifecycle_ledger"},
+        "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "lifecycle_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "events": {
+          "type": "array",
+          "uniqueItems": true,
+          "x-skeleton-ordering": "event_ordinal_ascending",
+          "items": {"$ref": "#/$defs/lifecycleEvent"}
+        },
+        "event_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "terminal_event_count": {"type": "integer", "minimum": 0, "maximum": 1},
+        "disposition": {"enum": ["open", "terminal", "abandoned"]}
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "disposition": {"const": "open"},
+            "terminal_event_count": {"const": 0}
+          }
+        },
+        {
+          "properties": {
+            "disposition": {"enum": ["terminal", "abandoned"]},
+            "terminal_event_count": {"const": 1},
+            "events": {"minItems": 2}
+          }
+        }
+      ]
+    }
+  },
+  "oneOf": [
+    {"$ref": "#/$defs/lifecycleEvent"},
+    {"$ref": "#/$defs/lifecycleLedger"}
+  ]
+}

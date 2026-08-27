@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/memory-quota.schema.json",
+  "title": "Skeleton Four-Tier Memory Quota Event v1",
+  "description": "One append-only integer byte-accounting event across the four closed storage tiers under the exact 274877906944-byte total ceiling: signed canonical-BLOB-length deltas, per-mille utilization bands selecting versioned retention thresholds, the typed metabolize_first outcome for at-ceiling low-tier admission, and structurally marked pressure-exempt accounting, disposition, and audit appends.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE12_QUOTA_V1",
+  "$defs": {
+    "storageTier": {
+      "enum": ["hot", "warm", "adapter", "fossil"]
+    },
+    "quotaCause": {
+      "enum": [
+        "admission",
+        "compression",
+        "tombstone",
+        "fossil_demotion",
+        "residue_eviction"
+      ]
+    },
+    "appendClass": {
+      "enum": [
+        "content_admission",
+        "accounting_append",
+        "disposition_append",
+        "audit_append"
+      ]
+    },
+    "safeSignedInteger": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "ceilingBoundedBytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 274877906944
+    },
+    "perMille": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "eventCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "quota_event_id",
+        "cycle_ordinal",
+        "cycle_input_root",
+        "fence_id",
+        "generation",
+        "attempt_ordinal",
+        "tier",
+        "cause",
+        "append_class",
+        "pressure_exempt",
+        "measurement",
+        "tier_quota_bytes",
+        "total_ceiling_bytes",
+        "attempted_delta_bytes",
+        "committed_delta_bytes",
+        "tier_bytes_before",
+        "tier_bytes_after",
+        "total_bytes_before",
+        "total_bytes_after",
+        "utilization_per_mille",
+        "retention_threshold_version",
+        "outcome"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.memory-quota.v1"},
+        "record_type": {"const": "quota_event"},
+        "quota_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "cycle_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "cycle_input_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "tier": {"$ref": "#/$defs/storageTier"},
+        "cause": {"$ref": "#/$defs/quotaCause"},
+        "append_class": {"$ref": "#/$defs/appendClass"},
+        "pressure_exempt": {"type": "boolean"},
+        "measurement": {"const": "canonical_blob_length_in_transaction"},
+        "tier_quota_bytes": {"$ref": "#/$defs/ceilingBoundedBytes"},
+        "total_ceiling_bytes": {"const": 274877906944},
+        "attempted_delta_bytes": {"$ref": "#/$defs/safeSignedInteger"},
+        "committed_delta_bytes": {"$ref": "#/$defs/safeSignedInteger"},
+        "tier_bytes_before": {"$ref": "#/$defs/ceilingBoundedBytes"},
+        "tier_bytes_after": {"$ref": "#/$defs/ceilingBoundedBytes"},
+        "total_bytes_before": {"$ref": "#/$defs/ceilingBoundedBytes"},
+        "total_bytes_after": {"$ref": "#/$defs/ceilingBoundedBytes"},
+        "utilization_per_mille": {"$ref": "#/$defs/perMille"},
+        "retention_threshold_version": {"const": "skeleton.memory-retention.v1"},
+        "outcome": {"enum": ["applied", "metabolize_first"]}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "x-skeleton-branch": "content_admission_applied",
+          "properties": {
+            "append_class": {"const": "content_admission"},
+            "pressure_exempt": {"const": false},
+            "outcome": {"const": "applied"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "x-skeleton-branch": "content_admission_metabolize_first",
+          "properties": {
+            "append_class": {"const": "content_admission"},
+            "pressure_exempt": {"const": false},
+            "cause": {"const": "admission"},
+            "outcome": {"const": "metabolize_first"},
+            "committed_delta_bytes": {"const": 0}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "x-skeleton-branch": "pressure_exempt_append",
+          "properties": {
+            "append_class": {"enum": ["accounting_append", "disposition_append", "audit_append"]},
+            "pressure_exempt": {"const": true},
+            "outcome": {"const": "applied"}
+          }
+        }
+      ]
+    }
+  ]
+}

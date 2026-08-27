@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/recall-packet.schema.json",
+  "title": "Skeleton Recall Conductor Packet v1",
+  "description": "One sealed budgeted evidence packet over the seven closed recall lenses: per-lens verified Phase 10 retrieval-result roots, whole-record inclusion ledgers with typed exclusion reasons, the immutable seven-counter budget vector with allocated/reserved/consumed branches, and a typed partial branch naming the exhausted counter and every unexecuted lens; no member can hold a truncated record.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE12_RECALL_PACKET_V1",
+  "x-skeleton-monotonic": "consumed_le_reserved_le_allocated_per_counter",
+  "x-skeleton-sorted-inventories": ["lens_entries.lens", "unexecuted_lenses"],
+  "$defs": {
+    "recallLens": {
+      "enum": [
+        "episodic",
+        "semantic",
+        "causal",
+        "procedural",
+        "contradiction",
+        "prospective",
+        "ancestral"
+      ]
+    },
+    "exclusionReason": {
+      "enum": [
+        "scope_mismatch",
+        "quarantined",
+        "budget_excluded",
+        "relevance_below_threshold",
+        "duplicate_of_included"
+      ]
+    },
+    "exclusionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["memory_id", "exclusion_reason"],
+      "properties": {
+        "memory_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "exclusion_reason": {"$ref": "#/$defs/exclusionReason"}
+      }
+    },
+    "lensEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lens",
+        "retrieval_result_root",
+        "included_record_ids",
+        "exclusions"
+      ],
+      "properties": {
+        "lens": {"$ref": "#/$defs/recallLens"},
+        "retrieval_result_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "included_record_ids": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/hashInventory"},
+        "exclusions": {
+          "type": "array",
+          "uniqueItems": true,
+          "x-skeleton-ordering": "memory_id_lexicographic",
+          "x-skeleton-unique-fields": [["memory_id"]],
+          "items": {"$ref": "#/$defs/exclusionEntry"}
+        }
+      }
+    },
+    "budgetLedger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allocated", "reserved", "consumed"],
+      "properties": {
+        "allocated": {"$ref": "https://schemas.skeleton.local/v1/agent-budget.schema.json#/$defs/budgetVector"},
+        "reserved": {"$ref": "https://schemas.skeleton.local/v1/agent-budget.schema.json#/$defs/budgetVector"},
+        "consumed": {"$ref": "https://schemas.skeleton.local/v1/agent-budget.schema.json#/$defs/budgetVector"}
+      }
+    },
+    "lensInventory": {
+      "type": "array",
+      "maxItems": 7,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "recall_lens_canonical_order",
+      "items": {"$ref": "#/$defs/recallLens"}
+    },
+    "noneOrBudgetFamily": {
+      "oneOf": [
+        {"const": "none"},
+        {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/budgetFamily"}
+      ]
+    },
+    "packetCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "packet_id",
+        "invocation_id",
+        "fence_id",
+        "generation",
+        "attempt_ordinal",
+        "lens_entries",
+        "budget",
+        "completeness",
+        "exhausted_counter",
+        "unexecuted_lenses"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.recall-packet.v1"},
+        "record_type": {"const": "conductor_packet"},
+        "packet_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "lens_entries": {
+          "type": "array",
+          "maxItems": 7,
+          "uniqueItems": true,
+          "x-skeleton-ordering": "recall_lens_canonical_order",
+          "x-skeleton-unique-fields": [["lens"]],
+          "items": {"$ref": "#/$defs/lensEntry"}
+        },
+        "budget": {"$ref": "#/$defs/budgetLedger"},
+        "completeness": {"enum": ["complete", "partial"]},
+        "exhausted_counter": {"$ref": "#/$defs/noneOrBudgetFamily"},
+        "unexecuted_lenses": {"$ref": "#/$defs/lensInventory"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "allOf": [
+        {"$ref": "#/$defs/packetCommon"},
+        {
+          "properties": {
+            "completeness": {"const": "complete"},
+            "lens_entries": {"minItems": 7, "maxItems": 7},
+            "exhausted_counter": {"const": "none"},
+            "unexecuted_lenses": {"maxItems": 0}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/packetCommon"},
+        {
+          "properties": {
+            "completeness": {"const": "partial"},
+            "lens_entries": {"maxItems": 6},
+            "exhausted_counter": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/budgetFamily"},
+            "unexecuted_lenses": {"minItems": 1}
+          }
+        }
+      ]
+    }
+  ]
+}

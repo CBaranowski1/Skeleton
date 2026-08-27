@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/market-listed-option-payload.schema.json",
+  "title": "Listed Option Payload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "underlying_identity_id",
+    "option_root",
+    "expiration",
+    "call_put",
+    "strike",
+    "multiplier",
+    "exercise_style",
+    "exercise_cutoff",
+    "deliverable",
+    "fee_basis_id",
+    "margin_metadata_id",
+    "settlement_basis_id",
+    "lifecycle_state"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "skeleton.market-listed-option-payload.v1"
+    },
+    "underlying_identity_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "option_root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expiration": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"
+    },
+    "call_put": {
+      "enum": [
+        "call",
+        "put"
+      ]
+    },
+    "strike": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/positiveDecimal"
+    },
+    "multiplier": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/positiveDecimal"
+    },
+    "exercise_style": {
+      "enum": [
+        "american",
+        "european"
+      ]
+    },
+    "exercise_cutoff": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"
+    },
+    "deliverable": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fee_basis_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "margin_metadata_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "settlement_basis_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "lifecycle_state": {
+      "enum": [
+        "listed",
+        "open",
+        "halted",
+        "unavailable",
+        "cancelled",
+        "expired",
+        "exercised",
+        "assigned",
+        "corrected",
+        "settled"
+      ]
+    }
+  }
+}

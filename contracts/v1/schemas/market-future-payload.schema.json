@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/market-future-payload.schema.json",
+  "title": "Future Payload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "product_id",
+    "contract_month",
+    "unit",
+    "multiplier",
+    "tick_size",
+    "tick_value",
+    "price_convention",
+    "first_notice",
+    "last_trade",
+    "expiry",
+    "price_limit",
+    "daily_settlement_basis_id",
+    "final_settlement_basis_id",
+    "delivery",
+    "roll_evidence_id",
+    "fee_basis_id",
+    "margin_metadata_id",
+    "lifecycle_state"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "skeleton.market-future-payload.v1"
+    },
+    "product_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contract_month": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])$"
+    },
+    "unit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "multiplier": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/positiveDecimal"
+    },
+    "tick_size": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/positiveDecimal"
+    },
+    "tick_value": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/positiveDecimal"
+    },
+    "price_convention": {
+      "type": "string",
+      "minLength": 1
+    },
+    "first_notice": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"
+    },
+    "last_trade": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"
+    },
+    "expiry": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"
+    },
+    "price_limit": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/positiveDecimal"
+    },
+    "daily_settlement_basis_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "final_settlement_basis_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "delivery": {
+      "enum": [
+        "cash",
+        "physical"
+      ]
+    },
+    "roll_evidence_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "fee_basis_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "margin_metadata_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "lifecycle_state": {
+      "enum": [
+        "listed",
+        "open",
+        "halted",
+        "unavailable",
+        "cancelled",
+        "expired",
+        "rolled",
+        "delivered",
+        "corrected",
+        "settled"
+      ]
+    }
+  }
+}

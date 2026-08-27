@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/simulation-artifact.schema.json",
+  "title": "Skeleton Deterministic Simulation Artifact Union v1",
+  "description": "Closed data-only union for simulation profiles, resolution, events, traces, costs, labels, corrections, and calibration evidence.",
+  "x-skeleton-disjoint-inventories": [
+    ["admitted_inputs", "rights_excluded_inputs"]
+  ],
+  "x-skeleton-sorted-inventories": [
+    "candidate_inputs",
+    "admitted_inputs",
+    "rights_excluded_inputs"
+  ],
+  "$defs": {
+    "hash": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"},
+    "hashInventory": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"},
+    "nonemptyHashInventory": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/nonemptyHashInventory"},
+    "timestamp": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/utcTimestamp"},
+    "decimal": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/fixedDecimal"},
+    "identifier": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/identifier"},
+    "family": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/marketFamily"},
+    "candidate": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/candidateInput"}
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "artifact_id", "family", "phase08_adapter_id", "model_version", "calendar_version", "applicable_cost_dimensions", "observable_event_classes", "fill_states", "settlement_requirements"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_model_profile"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "family": {"$ref": "#/$defs/family"},
+        "phase08_adapter_id": {"$ref": "#/$defs/hash"},
+        "model_version": {"$ref": "#/$defs/identifier"},
+        "calendar_version": {"$ref": "#/$defs/identifier"},
+        "applicable_cost_dimensions": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/stringInventory"},
+        "observable_event_classes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "x-skeleton-ordering": "lexicographic",
+          "items": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/eventClass"}
+        },
+        "fill_states": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["no_fill", "partial_fill", "full_fill"]}
+        },
+        "settlement_requirements": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/stringInventory"}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "artifact_id", "candidate"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_candidate_input"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "candidate": {"$ref": "#/$defs/candidate"}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "artifact_id", "manifest_id", "candidate_id", "event_id", "available_at", "effective_at", "explicit_sequence", "event_class", "family", "payload_sha256", "admission_decision_id"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_event"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "manifest_id": {"$ref": "#/$defs/hash"},
+        "candidate_id": {"$ref": "#/$defs/hash"},
+        "event_id": {"$ref": "#/$defs/hash"},
+        "available_at": {"$ref": "#/$defs/timestamp"},
+        "effective_at": {"$ref": "#/$defs/timestamp"},
+        "explicit_sequence": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "event_class": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/eventClass"},
+        "family": {"$ref": "#/$defs/family"},
+        "payload_sha256": {"$ref": "#/$defs/hash"},
+        "admission_decision_id": {"$ref": "#/$defs/hash"}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "artifact_id", "manifest_id", "candidate_id", "request_id", "rights_record_id", "legal_terms_id", "reason_code"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_rights_exclusion"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "manifest_id": {"$ref": "#/$defs/hash"},
+        "candidate_id": {"$ref": "#/$defs/hash"},
+        "request_id": {"$ref": "#/$defs/hash"},
+        "rights_record_id": {"$ref": "#/$defs/hash"},
+        "legal_terms_id": {"$ref": "#/$defs/hash"},
+        "reason_code": {
+          "enum": ["rights_record_missing", "rights_expired", "rights_revoked", "rights_terminated", "rights_superseded", "rights_unknown", "rights_not_yet_effective", "unresolved_counsel_question", "legal_terms_unavailable", "acquisition_not_authorized", "external_transmission_not_authorized", "rights_incompatible"]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "x-skeleton-disjoint-inventories": [["admitted_inputs", "rights_excluded_inputs"]],
+      "required": ["schema_version", "artifact_type", "artifact_id", "manifest_id", "candidate_inputs", "admitted_inputs", "rights_excluded_inputs", "resolution_status"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_input_resolution"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "manifest_id": {"$ref": "#/$defs/hash"},
+        "candidate_inputs": {"$ref": "#/$defs/nonemptyHashInventory"},
+        "admitted_inputs": {"$ref": "#/$defs/hashInventory"},
+        "rights_excluded_inputs": {"$ref": "#/$defs/hashInventory"},
+        "resolution_status": {"enum": ["admitted", "mixed", "all_excluded"]}
+      },
+      "allOf": [
+        {"if": {"properties": {"resolution_status": {"const": "admitted"}}}, "then": {"properties": {"admitted_inputs": {"minItems": 1}, "rights_excluded_inputs": {"maxItems": 0}}}},
+        {"if": {"properties": {"resolution_status": {"const": "mixed"}}}, "then": {"properties": {"admitted_inputs": {"minItems": 1}, "rights_excluded_inputs": {"minItems": 1}}}},
+        {"if": {"properties": {"resolution_status": {"const": "all_excluded"}}}, "then": {"properties": {"admitted_inputs": {"maxItems": 0}, "rights_excluded_inputs": {"minItems": 1}}}}
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "artifact_id", "manifest_id", "terminal_code", "successful", "calibration_eligible", "candidate_inputs", "admitted_inputs", "rights_excluded_inputs", "events", "fills", "costs", "settlements", "success_labels"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_all_inputs_rights_excluded"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "manifest_id": {"$ref": "#/$defs/hash"},
+        "terminal_code": {"const": "simulation_all_inputs_rights_excluded"},
+        "successful": {"const": false},
+        "calibration_eligible": {"const": false},
+        "candidate_inputs": {"$ref": "#/$defs/nonemptyHashInventory"},
+        "admitted_inputs": {"type": "array", "maxItems": 0},
+        "rights_excluded_inputs": {"$ref": "#/$defs/nonemptyHashInventory"},
+        "events": {"type": "array", "maxItems": 0},
+        "fills": {"type": "array", "maxItems": 0},
+        "costs": {"type": "array", "maxItems": 0},
+        "settlements": {"type": "array", "maxItems": 0},
+        "success_labels": {"type": "array", "maxItems": 0}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "artifact_id", "manifest_id", "state_id", "simulated_at", "family", "status", "payload_sha256"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_state"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "manifest_id": {"$ref": "#/$defs/hash"},
+        "state_id": {"$ref": "#/$defs/hash"},
+        "simulated_at": {"$ref": "#/$defs/timestamp"},
+        "family": {"$ref": "#/$defs/family"},
+        "status": {"enum": ["initial", "active", "abstained", "unresolved", "rolled_back", "corrected", "voided", "settled"]},
+        "payload_sha256": {"$ref": "#/$defs/hash"}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "artifact_id", "manifest_id", "ordinal", "event_id", "prior_transition_id", "simulated_at", "pre_state_hash", "decision_hash", "fill_hashes", "cost_hashes", "label_hash", "post_state_hash", "draw_ids", "model_profile_id", "engine_version", "ordering_policy_version"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_transition"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "manifest_id": {"$ref": "#/$defs/hash"},
+        "ordinal": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "event_id": {"$ref": "#/$defs/hash"},
+        "prior_transition_id": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/hash"}]},
+        "simulated_at": {"$ref": "#/$defs/timestamp"},
+        "pre_state_hash": {"$ref": "#/$defs/hash"},
+        "decision_hash": {"$ref": "#/$defs/hash"},
+        "fill_hashes": {"$ref": "#/$defs/hashInventory"},
+        "cost_hashes": {"$ref": "#/$defs/hashInventory"},
+        "label_hash": {"$ref": "#/$defs/hash"},
+        "post_state_hash": {"$ref": "#/$defs/hash"},
+        "draw_ids": {"$ref": "#/$defs/hashInventory"},
+        "model_profile_id": {"$ref": "#/$defs/hash"},
+        "engine_version": {"$ref": "#/$defs/identifier"},
+        "ordering_policy_version": {"$ref": "#/$defs/identifier"}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "artifact_id", "manifest_id", "cost_dimension", "applicability", "value", "currency", "unit", "evidence_ids", "missing_evidence_ids", "reason_code", "model_profile_id"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_cost"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "manifest_id": {"$ref": "#/$defs/hash"},
+        "cost_dimension": {"enum": ["spread", "slippage", "impact", "latency", "participation", "liquidity", "fee", "financing", "tax", "gas", "funding", "borrow", "withdrawal", "settlement"]},
+        "applicability": {"enum": ["applicable", "not_applicable", "unresolved"]},
+        "value": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/decimal"}]},
+        "currency": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[A-Z]{3}$"}]},
+        "unit": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/identifier"}]},
+        "evidence_ids": {"$ref": "#/$defs/hashInventory"},
+        "missing_evidence_ids": {"$ref": "#/$defs/hashInventory"},
+        "reason_code": {"oneOf": [{"type": "null"}, {"enum": ["dimension_not_applicable", "family_incompatible", "evidence_missing", "evidence_unavailable", "rights_excluded", "settlement_unresolved"]}]},
+        "model_profile_id": {"$ref": "#/$defs/hash"}
+      },
+      "allOf": [
+        {"if": {"properties": {"applicability": {"const": "applicable"}}}, "then": {"properties": {"value": {"type": "string"}, "currency": {"type": "string"}, "unit": {"type": "string"}, "evidence_ids": {"minItems": 1}, "missing_evidence_ids": {"maxItems": 0}, "reason_code": {"type": "null"}}}},
+        {"if": {"properties": {"applicability": {"const": "not_applicable"}}}, "then": {"properties": {"value": {"type": "null"}, "currency": {"type": "null"}, "unit": {"type": "null"}, "evidence_ids": {"maxItems": 0}, "missing_evidence_ids": {"maxItems": 0}, "reason_code": {"enum": ["dimension_not_applicable", "family_incompatible"]}}}},
+        {"if": {"properties": {"applicability": {"const": "unresolved"}}}, "then": {"properties": {"value": {"type": "null"}, "currency": {"type": "null"}, "unit": {"type": "null"}, "evidence_ids": {"maxItems": 0}, "missing_evidence_ids": {"minItems": 1}, "reason_code": {"enum": ["evidence_missing", "evidence_unavailable", "rights_excluded", "settlement_unresolved"]}}}}
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "artifact_id", "manifest_id", "label_state", "value", "settlement_evidence_ids", "missing_evidence_ids", "reason_code"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_label"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "manifest_id": {"$ref": "#/$defs/hash"},
+        "label_state": {"enum": ["success", "failure", "unresolved", "not_applicable"]},
+        "value": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/decimal"}]},
+        "settlement_evidence_ids": {"$ref": "#/$defs/hashInventory"},
+        "missing_evidence_ids": {"$ref": "#/$defs/hashInventory"},
+        "reason_code": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/identifier"}]}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "artifact_id", "manifest_id", "parent_run_id", "child_run_id", "changed_input_ids", "superseded_report_id"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_correction"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "manifest_id": {"$ref": "#/$defs/hash"},
+        "parent_run_id": {"$ref": "#/$defs/hash"},
+        "child_run_id": {"$ref": "#/$defs/hash"},
+        "changed_input_ids": {"$ref": "#/$defs/nonemptyHashInventory"},
+        "superseded_report_id": {"$ref": "#/$defs/hash"}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "artifact_id", "manifest_id", "prior_model_profile_id", "output_model_profile_id", "observation_ids", "rights_exclusion_ids", "evaluation_request_id", "algorithm_id", "code_sha256", "parameter_delta_sha256", "diagnostics_sha256", "training_eligible", "readiness_eligible", "promotion_eligible"],
+      "properties": {
+        "schema_version": {"const": "skeleton.simulation-artifact.v1"},
+        "artifact_type": {"const": "simulation_calibration"},
+        "artifact_id": {"$ref": "#/$defs/hash"},
+        "manifest_id": {"$ref": "#/$defs/hash"},
+        "prior_model_profile_id": {"$ref": "#/$defs/hash"},
+        "output_model_profile_id": {"$ref": "#/$defs/hash"},
+        "observation_ids": {"$ref": "#/$defs/nonemptyHashInventory"},
+        "rights_exclusion_ids": {"$ref": "#/$defs/hashInventory"},
+        "evaluation_request_id": {"$ref": "#/$defs/hash"},
+        "algorithm_id": {"$ref": "#/$defs/identifier"},
+        "code_sha256": {"$ref": "#/$defs/hash"},
+        "parameter_delta_sha256": {"$ref": "#/$defs/hash"},
+        "diagnostics_sha256": {"$ref": "#/$defs/hash"},
+        "training_eligible": {"const": false},
+        "readiness_eligible": {"const": false},
+        "promotion_eligible": {"const": false}
+      }
+    }
+  ]
+}

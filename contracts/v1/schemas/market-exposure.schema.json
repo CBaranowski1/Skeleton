@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/market-exposure.schema.json",
+  "title": "Skeleton Market Exposure v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "exposure_id", "kind", "value", "unit", "native_currency", "currency_basis", "direction", "evidence_sha256"],
+  "properties": {
+    "schema_version": {"const": "skeleton.market-exposure.v1"},
+    "exposure_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "kind": {"enum": ["shares", "contract_multiplier", "notional", "stake", "collateral", "payout", "token_units", "probability", "gross", "net", "currency_basis"]},
+    "value": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/canonicalExactDecimal"},
+    "unit": {"type": "string", "enum": ["share", "contract", "USD", "token", "ratio"]},
+    "native_currency": {"type": ["string", "null"], "enum": ["USD", "EUR", null]},
+    "currency_basis": {"enum": ["native", "reporting", "not_applicable"]},
+    "direction": {"enum": ["gross", "net", "not_applicable"]},
+    "evidence_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"}
+  }
+}

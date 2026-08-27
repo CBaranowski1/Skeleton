@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>Skeleton kernel status</title>
+    <link rel="stylesheet" href="./status.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell">
+        <p class="eyebrow">Private single-owner kernel</p>
+        <h1>Skeleton status</h1>
+        <p class="site-header__summary">
+          A read-only view of the server-owned kernel snapshot.
+        </p>
+      </div>
+    </header>
+
+    <main id="main-content" class="shell">
+      <section class="refresh-panel" aria-labelledby="refresh-heading">
+        <div>
+          <h2 id="refresh-heading">Current snapshot</h2>
+          <p>Refresh performs one loopback GET. It cannot issue a command or change kernel state.</p>
+        </div>
+        <button
+          id="status-refresh"
+          class="refresh-button"
+          type="button"
+          aria-controls="status-output"
+        >
+          <span aria-hidden="true">↻</span>
+          Refresh status
+        </button>
+      </section>
+
+      <div id="status-output" aria-busy="true">
+        <p class="loading-status" role="status">Loading validated status…</p>
+      </div>
+
+      <noscript>
+        <p class="noscript-note">
+          Status is unavailable because this read-only page requires JavaScript to perform its GET.
+        </p>
+      </noscript>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell">
+        <p>Local status only. No external assets or product integrations.</p>
+      </div>
+    </footer>
+
+    <script type="module" src="./status.js"></script>
+  </body>
+</html>

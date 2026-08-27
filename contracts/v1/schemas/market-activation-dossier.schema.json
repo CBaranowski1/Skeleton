@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/market-activation-dossier.schema.json",
+  "title": "Skeleton Market Activation Dossier v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "adapter_identity", "family", "venue", "jurisdiction", "environment", "version", "gates"],
+  "properties": {
+    "schema_version": {"const": "skeleton.market-activation-dossier.v1"},
+    "adapter_identity": {"type": "string", "minLength": 1, "maxLength": 512},
+    "family": {"enum": ["listed_cash_equity", "listed_option", "future", "contingent_contract", "sports_event_contract"]},
+    "venue": {"type": "string", "minLength": 1, "maxLength": 64},
+    "jurisdiction": {"type": "string", "minLength": 1, "maxLength": 64},
+    "environment": {"enum": ["fixture", "paper", "simulation"]},
+    "version": {"type": "string", "minLength": 1, "maxLength": 64},
+    "gates": {"type": "array", "maxItems": 11, "items": {"$ref": "#/$defs/gate"}}
+  },
+  "$defs": {
+    "timestamp": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"},
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "adapter_identity", "evidence_sha256", "source_class", "status", "reviewed_at", "expires_at", "blocker_codes"],
+      "properties": {
+        "name": {"enum": ["rights", "law_terms_jurisdiction", "identity", "calendar", "costs_fills", "failures_outages", "settlement", "security", "evaluation", "tax_accounting", "owner_authorization"]},
+        "adapter_identity": {"type": "string", "minLength": 1, "maxLength": 512},
+        "evidence_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "source_class": {"enum": ["independent", "synthetic"]},
+        "status": {"enum": ["verified", "unverified", "conflicting", "unknown"]},
+        "reviewed_at": {"$ref": "#/$defs/timestamp"},
+        "expires_at": {"$ref": "#/$defs/timestamp"},
+        "blocker_codes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}}
+      }
+    }
+  }
+}

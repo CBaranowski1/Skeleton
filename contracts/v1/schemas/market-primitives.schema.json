@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/market-primitives.schema.json",
+  "title": "Skeleton Market Primitives v1",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "exactDecimal": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/canonicalExactDecimal"},
+    "positiveDecimal": {"type": "string", "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]*[1-9])?|0\\.[0-9]*[1-9])$"},
+    "currency": {"type": "string", "enum": ["USD"]},
+    "unit": {"type": "string", "enum": ["share"]},
+    "tzdbZone": {"type": "string", "enum": ["America/New_York"]},
+    "calendar": {"type": "string", "enum": ["XNYS"]},
+    "localTimestamp": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"},
+    "utcTimestamp": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?Z$"}
+  }
+}

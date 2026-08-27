@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/candidate-version.schema.json",
+  "title": "Skeleton Immutable Candidate Version v1",
+  "description": "The LRN-13 verify-before-load contract: every model, prompt, calibration, tool, feature, threshold, or policy change is one immutable candidate-version row binding the closed change kind, the prior version identity or the exact genesis sentinel, the nonempty sorted unique artifact root set, and the verification receipt proving every artifact hash was checked before load; hash mismatch on load fails closed with no fallback, extending the ProviderDescriptor pinning discipline.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE13_CANDIDATE_VERSION",
+  "x-skeleton-sorted-inventories": ["artifact_roots"],
+  "x-skeleton-cross-field": [
+    "no artifact whose root lacks a committed verification receipt may load; verification_receipt_id proves hashes were checked before load (LRN-13)"
+  ],
+  "$defs": {
+    "nonGenesisSha256": {
+      "allOf": [
+        {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        {"not": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/genesisSha256"}}
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "schema_domain",
+    "version_id",
+    "change_kind",
+    "prior_version_id",
+    "artifact_roots",
+    "verification_receipt_id",
+    "version_ordinal"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.candidate-version.v1"},
+    "record_type": {"const": "candidate_version"},
+    "schema_domain": {"const": "SKELETON_PHASE13_CANDIDATE_VERSION"},
+    "version_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "change_kind": {
+      "enum": ["model", "prompt", "calibration", "tool", "feature", "threshold", "policy"]
+    },
+    "prior_version_id": {
+      "oneOf": [
+        {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/genesisSha256"},
+        {"$ref": "#/$defs/nonGenesisSha256"}
+      ]
+    },
+    "artifact_roots": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/nonemptyHashInventory"},
+    "verification_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "version_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+  }
+}

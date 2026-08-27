@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/market-contingent-payload.schema.json",
+  "title": "Contingent Contract Payload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "contract_id",
+    "outcomes",
+    "payout_unit",
+    "payout_basis_id",
+    "resolution_source_id",
+    "resolution_cutoff",
+    "rule_id",
+    "dispute_state",
+    "settlement_basis_id",
+    "lifecycle_state"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "skeleton.market-contingent-payload.v1"
+    },
+    "contract_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "outcomes": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "payout_unit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payout_basis_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "resolution_source_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "resolution_cutoff": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"
+    },
+    "rule_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "dispute_state": {
+      "enum": [
+        "none",
+        "open",
+        "resolved"
+      ]
+    },
+    "settlement_basis_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "lifecycle_state": {
+      "enum": [
+        "listed",
+        "open",
+        "halted",
+        "unavailable",
+        "cancelled",
+        "expired",
+        "voided",
+        "corrected",
+        "disputed",
+        "settled"
+      ]
+    }
+  }
+}

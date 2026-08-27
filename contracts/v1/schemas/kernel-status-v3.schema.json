@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/kernel-status-v3.schema.json",
+  "title": "Skeleton Additive Read-Only Kernel Status v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kernel_status_v1_sha256", "kernel_status_v2_sha256", "market_activation", "observed_at"],
+  "properties": {
+    "schema_version": {"const": "skeleton.kernel-status.v3"},
+    "kernel_status_v1_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "kernel_status_v2_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "observed_at": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"},
+    "market_activation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["activation_id", "dossier_sha256", "adapter_identity_sha256", "state", "blockers"],
+      "properties": {
+        "activation_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "dossier_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "adapter_identity_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "state": {"enum": ["inactive", "eligible_for_future_authorization"]},
+        "blockers": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}}
+      }
+    }
+  }
+}

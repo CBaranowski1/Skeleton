@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/agent-budget.schema.json",
+  "title": "Skeleton Immutable Agent Budget Ledger v1",
+  "description": "Immutable allocation and append-only reservation/reconciliation facts for dispatcher-owned monotonic resource use.",
+  "$defs": {
+    "budgetVector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_tokens",
+        "output_tokens",
+        "elapsed_milliseconds",
+        "memory_items",
+        "memory_bytes",
+        "tool_calls",
+        "accelerator_milliseconds"
+      ],
+      "properties": {
+        "input_tokens": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "output_tokens": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "elapsed_milliseconds": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "memory_items": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "memory_bytes": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "tool_calls": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "accelerator_milliseconds": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+      }
+    },
+    "zeroBudgetVector": {
+      "const": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "elapsed_milliseconds": 0,
+        "memory_items": 0,
+        "memory_bytes": 0,
+        "tool_calls": 0,
+        "accelerator_milliseconds": 0
+      }
+    },
+    "eventCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "budget_event_id",
+        "allocation_id",
+        "invocation_id",
+        "prior_budget_event_id",
+        "attempt",
+        "coordinator_generation",
+        "fence_id",
+        "allocation_limits",
+        "prior_consumption_root",
+        "attempted_delta",
+        "committed_delta",
+        "resulting_consumption_root",
+        "disposition",
+        "recorded_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.agent-budget.v1"},
+        "record_type": {"enum": ["reservation", "reconciliation"]},
+        "budget_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "allocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "prior_budget_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "attempt": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "coordinator_generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "allocation_limits": {"$ref": "#/$defs/budgetVector"},
+        "prior_consumption_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "attempted_delta": {"$ref": "#/$defs/budgetVector"},
+        "committed_delta": {"$ref": "#/$defs/budgetVector"},
+        "resulting_consumption_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "disposition": {
+          "enum": [
+            "reserved",
+            "reconciled",
+            "denied_budget_exhausted",
+            "rejected_nonmonotonic",
+            "rejected_usage_mismatch"
+          ]
+        },
+        "recorded_at": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/utcTimestamp"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "allocation_id",
+        "invocation_id",
+        "budget_profile_id",
+        "allocation_limits",
+        "allocation_root",
+        "allocated_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.agent-budget.v1"},
+        "record_type": {"const": "allocation"},
+        "allocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "budget_profile_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "allocation_limits": {"$ref": "#/$defs/budgetVector"},
+        "allocation_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "allocated_at": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/utcTimestamp"}
+      }
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "x-skeleton-monotonic": "append_nonnegative_committed_delta",
+          "properties": {"record_type": {"const": "reservation"}},
+          "oneOf": [
+            {"properties": {"disposition": {"const": "reserved"}}},
+            {
+              "properties": {
+                "disposition": {"const": "denied_budget_exhausted"},
+                "committed_delta": {"$ref": "#/$defs/zeroBudgetVector"}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "x-skeleton-monotonic": "append_nonnegative_committed_delta",
+          "properties": {"record_type": {"const": "reconciliation"}},
+          "oneOf": [
+            {"properties": {"disposition": {"const": "reconciled"}}},
+            {
+              "properties": {
+                "disposition": {"enum": ["rejected_nonmonotonic", "rejected_usage_mismatch"]},
+                "committed_delta": {"$ref": "#/$defs/zeroBudgetVector"}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

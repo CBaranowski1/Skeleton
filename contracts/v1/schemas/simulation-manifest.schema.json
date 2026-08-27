@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/simulation-manifest.schema.json",
+  "title": "Skeleton Deterministic Simulation Manifest v1",
+  "description": "Immutable run identity containing submitted candidates and a pure evaluation-rights request, never derived admission conclusions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "source_evidence_manifest_id",
+    "phase07_bundle_projection_sha256",
+    "phase08_bundle_projection_sha256",
+    "phase08_fixture_index_projection_sha256",
+    "simulation_schema_set_sha256",
+    "engine_version",
+    "ordering_policy_version",
+    "calendar_version",
+    "scenario_profile_id",
+    "counter_algorithm",
+    "seed",
+    "model_profile_ids",
+    "failure_schedule_ids",
+    "candidate_inputs",
+    "evaluation_request"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.simulation-manifest.v1"},
+    "manifest_id": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"},
+    "source_evidence_manifest_id": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"},
+    "phase07_bundle_projection_sha256": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"},
+    "phase08_bundle_projection_sha256": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"},
+    "phase08_fixture_index_projection_sha256": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"},
+    "simulation_schema_set_sha256": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"},
+    "engine_version": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/schemaVersion"},
+    "ordering_policy_version": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/schemaVersion"},
+    "calendar_version": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/schemaVersion"},
+    "scenario_profile_id": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"},
+    "counter_algorithm": {"const": "sha256_counter_v1"},
+    "seed": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/uint64"},
+    "model_profile_ids": {
+      "$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/nonemptyHashInventory"
+    },
+    "failure_schedule_ids": {
+      "$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"
+    },
+    "candidate_inputs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "candidate_id_lexicographic",
+      "x-skeleton-null-rejection": "simulation_events_null",
+      "x-skeleton-empty-rejection": "simulation_event_stream_empty",
+      "items": {
+        "$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/candidateInput"
+      }
+    },
+    "evaluation_request": {
+      "$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/evaluationUseRequest"
+    }
+  }
+}

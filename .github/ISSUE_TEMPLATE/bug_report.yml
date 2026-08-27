@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a reproducible defect using synthetic, non-sensitive data.
+title: '[Bug] '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve Skeleton. Do not include credentials,
+        private keys, owner evidence, personal paths, or vulnerability details.
+        Follow SECURITY.md for security reports.
+  - type: dropdown
+    id: boundary
+    attributes:
+      label: Affected boundary
+      options:
+        - Kernel semantics or persistence
+        - Contracts or fixtures
+        - Rust verifier or native bootstrap
+        - TypeScript or owner status surface
+        - Build, test, or release tooling
+        - Documentation or public-release policy
+        - Unsure
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed behavior
+      description: Describe the defect and its impact without sensitive data.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: Use only synthetic fixtures and owner-controlled environments.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Commit or release
+      placeholder: Full commit SHA; no supported release exists yet.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS and tool versions only; remove usernames and local paths.
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I removed secrets, personal paths, and private evidence.
+          required: true
+        - label: This is not a vulnerability report.
+          required: true

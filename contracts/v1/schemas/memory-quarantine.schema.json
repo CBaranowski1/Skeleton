@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/memory-quarantine.schema.json",
+  "title": "Skeleton Append-Only Memory Quarantine Decision v1",
+  "description": "A terminal append-only quarantine fact or verified-descendant recovery fact; the original subject is never cleared or mutated.",
+  "$defs": {
+    "sha256": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "timestamp": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/utcTimestamp"},
+    "sequence": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "previousDecision": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/noneOrSha256"},
+    "quarantineDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "decision_id",
+        "decision_sha256",
+        "decision_sequence",
+        "previous_decision_id",
+        "subject_id",
+        "finding_id",
+        "integrity_run_id",
+        "terminal_disposition",
+        "defect_code",
+        "recorded_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.memory-quarantine.v1"},
+        "decision_id": {"$ref": "#/$defs/sha256"},
+        "decision_sha256": {"$ref": "#/$defs/sha256"},
+        "decision_sequence": {"$ref": "#/$defs/sequence"},
+        "previous_decision_id": {"$ref": "#/$defs/previousDecision"},
+        "subject_id": {"$ref": "#/$defs/sha256"},
+        "finding_id": {"$ref": "#/$defs/sha256"},
+        "integrity_run_id": {"$ref": "#/$defs/sha256"},
+        "terminal_disposition": {"const": "quarantined"},
+        "defect_code": {"$ref": "https://schemas.skeleton.local/v1/memory-integrity.schema.json#/$defs/defectCode"},
+        "recorded_at": {"$ref": "#/$defs/timestamp"}
+      }
+    },
+    "verifiedRecoveryDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "decision_id",
+        "decision_sha256",
+        "decision_sequence",
+        "previous_decision_id",
+        "subject_id",
+        "finding_id",
+        "integrity_run_id",
+        "terminal_disposition",
+        "verified_descendant_id",
+        "verification_integrity_run_id",
+        "verification_finding_id",
+        "recorded_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.memory-quarantine.v1"},
+        "decision_id": {"$ref": "#/$defs/sha256"},
+        "decision_sha256": {"$ref": "#/$defs/sha256"},
+        "decision_sequence": {"$ref": "#/$defs/sequence"},
+        "previous_decision_id": {"$ref": "#/$defs/previousDecision"},
+        "subject_id": {"$ref": "#/$defs/sha256"},
+        "finding_id": {"$ref": "#/$defs/sha256"},
+        "integrity_run_id": {"$ref": "#/$defs/sha256"},
+        "terminal_disposition": {"const": "recovery_descendant_verified"},
+        "verified_descendant_id": {"$ref": "#/$defs/sha256"},
+        "verification_integrity_run_id": {"$ref": "#/$defs/sha256"},
+        "verification_finding_id": {"$ref": "#/$defs/sha256"},
+        "recorded_at": {"$ref": "#/$defs/timestamp"}
+      }
+    }
+  },
+  "oneOf": [
+    {"$ref": "#/$defs/quarantineDecision"},
+    {"$ref": "#/$defs/verifiedRecoveryDecision"}
+  ]
+}

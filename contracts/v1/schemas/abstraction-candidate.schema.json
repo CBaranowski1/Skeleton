@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/abstraction-candidate.schema.json",
+  "title": "Skeleton Cross-Domain Abstraction Candidate v1",
+  "description": "The only representable PLT-05 cross-domain transfer record: one source scope, nonempty sorted unique target scopes excluding the source, and one independent nonempty benefit-evidence identity array per named target scope; a target lacking its own evidence array is schema-invalid, and no field grants an apply path — evaluation belongs to Phase 14 science.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE13_ABSTRACTION",
+  "x-skeleton-sorted-inventories": ["target_scope_ids"],
+  "x-skeleton-cross-field": [
+    "target_scope_ids MUST NOT contain source_scope_id",
+    "the member names of per_target_benefit_evidence MUST equal target_scope_ids exactly, one independent evidence array per target (PLT-05)"
+  ],
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "schema_domain",
+    "candidate_id",
+    "source_scope_id",
+    "target_scope_ids",
+    "per_target_benefit_evidence",
+    "proposed_ordinal"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.abstraction-candidate.v1"},
+    "record_type": {"const": "abstraction_candidate"},
+    "schema_domain": {"const": "SKELETON_PHASE13_ABSTRACTION"},
+    "candidate_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "source_scope_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "target_scope_ids": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/nonemptyHashInventory"},
+    "per_target_benefit_evidence": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"pattern": "^[0-9a-f]{64}$"},
+      "additionalProperties": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/nonemptyHashInventory"}
+    },
+    "proposed_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+  }
+}

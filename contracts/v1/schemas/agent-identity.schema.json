@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/agent-identity.schema.json",
+  "title": "Skeleton Durable Agent Identity Event v1",
+  "description": "One content-addressed continuity event for one work identity; providers, models, aliases, sessions, organs, and display names are never identity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "agent_identity_event_id",
+    "work_identity_id",
+    "prior_agent_identity_event_id",
+    "coordinator_generation",
+    "parent_lifecycle_event_id",
+    "sealed_memory_snapshot_id",
+    "organ_registry_root",
+    "contract_set_root",
+    "recorded_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.agent-identity.v1"},
+    "record_type": {"const": "agent_identity_event"},
+    "agent_identity_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "work_identity_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "prior_agent_identity_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "coordinator_generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "parent_lifecycle_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "sealed_memory_snapshot_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "organ_registry_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "contract_set_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "recorded_at": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/utcTimestamp"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "prior_agent_identity_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/genesisSha256"}
+        },
+        "required": ["prior_agent_identity_event_id"]
+      },
+      "then": {
+        "properties": {
+          "coordinator_generation": {"const": 0},
+          "parent_lifecycle_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/genesisSha256"}
+        }
+      },
+      "else": {
+        "properties": {
+          "coordinator_generation": {"minimum": 1}
+        }
+      }
+    }
+  ]
+}

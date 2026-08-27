@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/memory-disposition.schema.json",
+  "title": "Skeleton Exactly-One Encounter Disposition v1",
+  "description": "One append-only content-addressed disposition ledger entry per admitted encounter: five closed terminal branches plus typed non-terminal deferral, with the Phase 7 erasure join and no Phase 12-minted deletion authority.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE12_DISPOSITION_V1",
+  "$defs": {
+    "disposition": {
+      "enum": [
+        "resident_capsule",
+        "compressed_concept",
+        "compressed_procedure",
+        "statistical_residue",
+        "audited_erasure",
+        "disposition_deferred"
+      ]
+    },
+    "deferralReason": {
+      "enum": [
+        "classification_failure",
+        "stage_timeout",
+        "storage_pressure",
+        "budget_exhausted",
+        "gate_receipt_incomplete",
+        "safety_hold"
+      ]
+    },
+    "noneOrDeferralReason": {
+      "oneOf": [
+        {"const": "none"},
+        {"$ref": "#/$defs/deferralReason"}
+      ]
+    },
+    "entryCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "disposition_id",
+        "encounter_id",
+        "cycle_ordinal",
+        "cycle_input_root",
+        "fence_id",
+        "generation",
+        "attempt_ordinal",
+        "disposition",
+        "capsule_id",
+        "artifact_id",
+        "gate_receipt_id",
+        "residue_snapshot_id",
+        "erasure_decision_id",
+        "deferral_reason"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.memory-disposition.v1"},
+        "record_type": {"const": "encounter_disposition"},
+        "disposition_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "encounter_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "cycle_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "cycle_input_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "disposition": {"$ref": "#/$defs/disposition"},
+        "capsule_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "artifact_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "gate_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "residue_snapshot_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "erasure_decision_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "deferral_reason": {"$ref": "#/$defs/noneOrDeferralReason"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "allOf": [
+        {"$ref": "#/$defs/entryCommon"},
+        {
+          "properties": {
+            "disposition": {"const": "resident_capsule"},
+            "capsule_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "artifact_id": {"const": "none"},
+            "gate_receipt_id": {"const": "none"},
+            "residue_snapshot_id": {"const": "none"},
+            "erasure_decision_id": {"const": "none"},
+            "deferral_reason": {"const": "none"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/entryCommon"},
+        {
+          "properties": {
+            "disposition": {"const": "compressed_concept"},
+            "capsule_id": {"const": "none"},
+            "artifact_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "gate_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "residue_snapshot_id": {"const": "none"},
+            "erasure_decision_id": {"const": "none"},
+            "deferral_reason": {"const": "none"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/entryCommon"},
+        {
+          "properties": {
+            "disposition": {"const": "compressed_procedure"},
+            "capsule_id": {"const": "none"},
+            "artifact_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "gate_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "residue_snapshot_id": {"const": "none"},
+            "erasure_decision_id": {"const": "none"},
+            "deferral_reason": {"const": "none"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/entryCommon"},
+        {
+          "properties": {
+            "disposition": {"const": "statistical_residue"},
+            "capsule_id": {"const": "none"},
+            "artifact_id": {"const": "none"},
+            "gate_receipt_id": {"const": "none"},
+            "residue_snapshot_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "erasure_decision_id": {"const": "none"},
+            "deferral_reason": {"const": "none"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/entryCommon"},
+        {
+          "x-skeleton-foreign-authority": "phase7_rights_decision",
+          "properties": {
+            "disposition": {"const": "audited_erasure"},
+            "capsule_id": {"const": "none"},
+            "artifact_id": {"const": "none"},
+            "gate_receipt_id": {"const": "none"},
+            "residue_snapshot_id": {"const": "none"},
+            "erasure_decision_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "deferral_reason": {"const": "none"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/entryCommon"},
+        {
+          "properties": {
+            "disposition": {"const": "disposition_deferred"},
+            "capsule_id": {"const": "none"},
+            "artifact_id": {"const": "none"},
+            "gate_receipt_id": {"const": "none"},
+            "residue_snapshot_id": {"const": "none"},
+            "erasure_decision_id": {"const": "none"},
+            "deferral_reason": {"$ref": "#/$defs/deferralReason"}
+          }
+        }
+      ]
+    }
+  ]
+}

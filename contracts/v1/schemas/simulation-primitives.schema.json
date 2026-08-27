@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json",
+  "title": "Skeleton Deterministic Simulation Primitives v1",
+  "description": "Closed canonical primitives for data-only, rights-aware deterministic simulation.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "sha256": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "identifier": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"
+    },
+    "schemaVersion": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/schemaVersion"
+    },
+    "fixedDecimal": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/canonicalExactDecimal"
+    },
+    "uint64": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/canonicalUint64"
+    },
+    "safeNonnegativeInteger": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "positiveVersion": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]*[1-9])?Z$"
+    },
+    "hashInventory": {
+      "type": "array",
+      "uniqueItems": true,
+      "x-skeleton-ordering": "lexicographic",
+      "items": {
+        "$ref": "#/$defs/sha256"
+      }
+    },
+    "nonemptyHashInventory": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "lexicographic",
+      "items": {
+        "$ref": "#/$defs/sha256"
+      }
+    },
+    "stringInventory": {
+      "type": "array",
+      "uniqueItems": true,
+      "x-skeleton-ordering": "lexicographic",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      }
+    },
+    "marketFamily": {
+      "enum": [
+        "listed_cash_equity",
+        "listed_option",
+        "future",
+        "contingent_contract",
+        "sports_event_contract"
+      ]
+    },
+    "eventClass": {
+      "enum": [
+        "market_observation",
+        "order_intent",
+        "arrival",
+        "venue_state",
+        "failure",
+        "fill",
+        "settlement",
+        "resolution",
+        "correction"
+      ]
+    },
+    "candidateInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "subject_sha256",
+        "evidence_sha256",
+        "source_rights_record_id",
+        "available_at",
+        "effective_at",
+        "explicit_sequence",
+        "event_class",
+        "family"
+      ],
+      "properties": {
+        "candidate_id": {"$ref": "#/$defs/sha256"},
+        "subject_sha256": {"$ref": "#/$defs/sha256"},
+        "evidence_sha256": {"$ref": "#/$defs/sha256"},
+        "source_rights_record_id": {"$ref": "#/$defs/sha256"},
+        "available_at": {"$ref": "#/$defs/utcTimestamp"},
+        "effective_at": {"$ref": "#/$defs/utcTimestamp"},
+        "explicit_sequence": {"$ref": "#/$defs/safeNonnegativeInteger"},
+        "event_class": {"$ref": "#/$defs/eventClass"},
+        "family": {"$ref": "#/$defs/marketFamily"}
+      }
+    },
+    "evaluationUseRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "boundary",
+        "evaluation_at",
+        "requested_at",
+        "nonce",
+        "request_id",
+        "requester_id",
+        "purpose",
+        "operation",
+        "subject_sha256",
+        "evidence_sha256",
+        "source_rights_record_id",
+        "source_legal_terms_id",
+        "rights_record_version",
+        "legal_terms_version",
+        "policy_digest",
+        "evaluator_version",
+        "territory",
+        "display",
+        "storage",
+        "derivation",
+        "training",
+        "transmission",
+        "backup",
+        "attribution",
+        "retention",
+        "deletion",
+        "audit",
+        "termination",
+        "acquisition_method",
+        "processing_boundary",
+        "destination"
+      ],
+      "properties": {
+        "boundary": {"const": "evaluation"},
+        "evaluation_at": {"$ref": "#/$defs/utcTimestamp"},
+        "requested_at": {"$ref": "#/$defs/utcTimestamp"},
+        "nonce": {"$ref": "#/$defs/safeNonnegativeInteger"},
+        "request_id": {"$ref": "#/$defs/sha256"},
+        "requester_id": {"$ref": "#/$defs/identifier"},
+        "purpose": {"$ref": "#/$defs/identifier"},
+        "operation": {"const": "deterministic_simulation"},
+        "subject_sha256": {"$ref": "#/$defs/sha256"},
+        "evidence_sha256": {"$ref": "#/$defs/sha256"},
+        "source_rights_record_id": {"$ref": "#/$defs/sha256"},
+        "source_legal_terms_id": {"$ref": "#/$defs/sha256"},
+        "rights_record_version": {"$ref": "#/$defs/positiveVersion"},
+        "legal_terms_version": {"$ref": "#/$defs/positiveVersion"},
+        "policy_digest": {"$ref": "#/$defs/sha256"},
+        "evaluator_version": {"$ref": "#/$defs/schemaVersion"},
+        "territory": {"type": "string", "pattern": "^[A-Z]{2}$"},
+        "display": {"$ref": "#/$defs/identifier"},
+        "storage": {"$ref": "#/$defs/identifier"},
+        "derivation": {"$ref": "#/$defs/identifier"},
+        "training": {"enum": ["prohibited", "permitted"]},
+        "transmission": {"$ref": "#/$defs/identifier"},
+        "backup": {"$ref": "#/$defs/identifier"},
+        "attribution": {"$ref": "#/$defs/identifier"},
+        "retention": {"$ref": "#/$defs/identifier"},
+        "deletion": {"$ref": "#/$defs/identifier"},
+        "audit": {"$ref": "#/$defs/identifier"},
+        "termination": {"$ref": "#/$defs/identifier"},
+        "acquisition_method": {
+          "enum": [
+            "documented_api",
+            "licensed_file",
+            "owner_download",
+            "provided_fixture",
+            "public_viewable",
+            "undocumented_endpoint"
+          ]
+        },
+        "processing_boundary": {"$ref": "#/$defs/identifier"},
+        "destination": {"$ref": "#/$defs/identifier"}
+      }
+    }
+  }
+}

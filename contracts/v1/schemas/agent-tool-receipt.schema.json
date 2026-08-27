@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/agent-tool-receipt.schema.json",
+  "title": "Skeleton Agent Tool Receipt v1",
+  "description": "Allowed or denied local dispatcher evidence that binds one closed allowlist entry without exposing a callable handle.",
+  "$defs": {
+    "operation": {
+      "enum": [
+        "canonical_metadata_read",
+        "deterministic_fixture_lookup",
+        "sealed_artifact_read"
+      ]
+    },
+    "toolReceiptInventory": {
+      "type": "array",
+      "uniqueItems": true,
+      "x-skeleton-ordering": "tool_receipt_id_lexicographic",
+      "items": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+    },
+    "common": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "tool_receipt_id",
+        "invocation_id",
+        "attempt",
+        "allowlist_root",
+        "allowlist_entry_id",
+        "operation",
+        "argument_schema_root",
+        "argument_root",
+        "result_schema_root",
+        "result_root",
+        "data_classification",
+        "filesystem_scope",
+        "egress_class",
+        "timeout_ms",
+        "maximum_calls",
+        "call_ordinal",
+        "call_count",
+        "external_effect_count",
+        "disposition",
+        "denial_reason",
+        "elapsed_milliseconds",
+        "recorded_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.agent-tool-receipt.v1"},
+        "record_type": {"const": "tool_receipt"},
+        "tool_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "attempt": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "allowlist_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "allowlist_entry_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "operation": {"$ref": "#/$defs/operation"},
+        "argument_schema_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "argument_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "result_schema_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "result_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "data_classification": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/dataClassification"},
+        "filesystem_scope": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/filesystemScope"},
+        "egress_class": {"const": "none"},
+        "timeout_ms": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "maximum_calls": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "call_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "call_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "external_effect_count": {"const": 0},
+        "disposition": {"enum": ["allowed", "denied"]},
+        "denial_reason": {
+          "enum": [
+            "none",
+            "unknown_operation",
+            "not_allowlisted",
+            "argument_schema_invalid",
+            "classification_denied",
+            "filesystem_scope_denied",
+            "egress_denied",
+            "budget_exhausted",
+            "timeout",
+            "dispatcher_error"
+          ]
+        },
+        "elapsed_milliseconds": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "recorded_at": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/utcTimestamp"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "allOf": [
+        {"$ref": "#/$defs/common"},
+        {
+          "properties": {
+            "disposition": {"const": "allowed"},
+            "denial_reason": {"const": "none"},
+            "result_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "call_ordinal": {"minimum": 1},
+            "call_count": {"const": 1}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/common"},
+        {
+          "properties": {
+            "disposition": {"const": "denied"},
+            "denial_reason": {
+              "enum": [
+                "unknown_operation",
+                "not_allowlisted",
+                "argument_schema_invalid",
+                "classification_denied",
+                "filesystem_scope_denied",
+                "egress_denied",
+                "budget_exhausted",
+                "timeout",
+                "dispatcher_error"
+              ]
+            },
+            "result_root": {"const": "none"},
+            "call_ordinal": {"const": 0},
+            "call_count": {"const": 0}
+          }
+        }
+      ]
+    }
+  ]
+}

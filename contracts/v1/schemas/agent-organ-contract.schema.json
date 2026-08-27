@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/agent-organ-contract.schema.json",
+  "title": "Skeleton Agent Organ Contract v1",
+  "description": "A closed evidence-duty and advisory capability profile for a typed organ and optional subordinate specialist roles.",
+  "type": "object",
+  "additionalProperties": false,
+  "x-skeleton-sorted-inventories": ["specialist_roles", "evidence_duties"],
+  "x-skeleton-authority-free": true,
+  "required": [
+    "schema_version",
+    "record_type",
+    "organ_contract_id",
+    "organ",
+    "organ_contract_version",
+    "specialist_roles",
+    "evidence_duties",
+    "input_schema_id",
+    "output_schema_id",
+    "context_construction_version",
+    "model_capability_profile_id",
+    "budget_profile_id",
+    "tool_allowlist_root",
+    "capability_root",
+    "timeout_ms",
+    "advisory_only"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.agent-organ-contract.v1"},
+    "record_type": {"const": "organ_contract"},
+    "organ_contract_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "organ": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/organ"},
+    "organ_contract_version": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/schemaVersion"},
+    "specialist_roles": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/specialistRoleInventory"},
+    "evidence_duties": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "lexicographic",
+      "items": {
+        "enum": [
+          "bind_complete_evidence_root",
+          "bind_complete_memory_root",
+          "declare_conclusion",
+          "declare_evidence_gaps",
+          "declare_objections",
+          "declare_uncertainty",
+          "preserve_provenance",
+          "record_terminal_reason"
+        ]
+      }
+    },
+    "input_schema_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "output_schema_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "context_construction_version": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/schemaVersion"},
+    "model_capability_profile_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "budget_profile_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "tool_allowlist_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "capability_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "timeout_ms": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+    "advisory_only": {"const": true}
+  }
+}

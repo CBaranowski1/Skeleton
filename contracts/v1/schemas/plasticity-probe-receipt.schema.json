@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/plasticity-probe-receipt.schema.json",
+  "title": "Skeleton Plasticity Probe Receipt v1",
+  "description": "One append-only content-addressed receipt for one probe of the closed ordered five-probe battery (domain, general_capability, calibration, safety, prior_regression) over one candidate delta: the probe kind is structurally pinned to its frozen ordinal, pass/fail accounting is exact-integer with gate-receipt verdict consistency (a passed receipt cannot carry failures, a failed receipt must), and a real_model evaluation basis is unrepresentable without a pending_owner_hardware placeholder identity — fabricated real-model measurements are rejected by shape (D-10, D-18).",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE13_PROBE",
+  "x-skeleton-cross-field": [
+    "passed_count + failed_count MUST equal total_count exactly",
+    "a partially probed delta cannot reach the applied state: all five probe kinds must hold passed receipts before any activation (PLT-06)"
+  ],
+  "$defs": {
+    "receiptCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "schema_domain",
+        "receipt_id",
+        "delta_id",
+        "probe_kind",
+        "probe_ordinal",
+        "evaluation_basis",
+        "passed_count",
+        "failed_count",
+        "total_count",
+        "status",
+        "placeholder_id",
+        "fence_id",
+        "generation",
+        "attempt_ordinal"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.plasticity-probe-receipt.v1"},
+        "record_type": {"const": "probe_receipt"},
+        "schema_domain": {"const": "SKELETON_PHASE13_PROBE"},
+        "receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "delta_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "probe_kind": {
+          "enum": ["domain", "general_capability", "calibration", "safety", "prior_regression"]
+        },
+        "probe_ordinal": {"type": "integer", "minimum": 0, "maximum": 4},
+        "evaluation_basis": {"enum": ["reference_kernel", "fixture_battery", "real_model"]},
+        "passed_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "failed_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "total_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "status": {"enum": ["passed", "failed"]},
+        "placeholder_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"}
+      }
+    }
+  },
+  "allOf": [
+    {"$ref": "#/$defs/receiptCommon"},
+    {
+      "x-skeleton-constraint": "frozen_probe_order",
+      "oneOf": [
+        {"properties": {"probe_kind": {"const": "domain"}, "probe_ordinal": {"const": 0}}},
+        {"properties": {"probe_kind": {"const": "general_capability"}, "probe_ordinal": {"const": 1}}},
+        {"properties": {"probe_kind": {"const": "calibration"}, "probe_ordinal": {"const": 2}}},
+        {"properties": {"probe_kind": {"const": "safety"}, "probe_ordinal": {"const": 3}}},
+        {"properties": {"probe_kind": {"const": "prior_regression"}, "probe_ordinal": {"const": 4}}}
+      ]
+    },
+    {
+      "x-skeleton-constraint": "verdict_consistency",
+      "oneOf": [
+        {
+          "properties": {
+            "status": {"const": "passed"},
+            "failed_count": {"const": 0}
+          }
+        },
+        {
+          "properties": {
+            "status": {"const": "failed"},
+            "failed_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"}
+          }
+        }
+      ]
+    },
+    {
+      "x-skeleton-constraint": "hardware_honesty_placeholder_binding",
+      "oneOf": [
+        {
+          "properties": {
+            "evaluation_basis": {"enum": ["reference_kernel", "fixture_battery"]},
+            "placeholder_id": {"const": "none"}
+          }
+        },
+        {
+          "properties": {
+            "evaluation_basis": {"const": "real_model"},
+            "placeholder_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/semantic-memory-payload.schema.json",
+  "title": "Skeleton Sourced Semantic Memory Payload v1",
+  "description": "Closed sourced fact with jurisdiction, half-open effective interval, correction ancestry, and explicit contradiction membership.",
+  "type": "object",
+  "additionalProperties": false,
+  "x-skeleton-sorted-inventories": ["source_evidence_ids"],
+  "x-skeleton-half-open-interval": "effective_interval",
+  "required": [
+    "schema_version",
+    "claim_id",
+    "claim_subject_id",
+    "claim_predicate",
+    "claim_object_sha256",
+    "source_evidence_ids",
+    "source_rights_decision_id",
+    "jurisdiction",
+    "effective_interval",
+    "contradiction_set_id"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.semantic-memory-payload.v1"},
+    "claim_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "claim_subject_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "claim_predicate": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/identifier"},
+    "claim_object_sha256": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "source_evidence_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/nonemptyHashInventory"},
+    "source_rights_decision_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "jurisdiction": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/identifier"},
+    "effective_interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start_inclusive", "end_exclusive"],
+      "properties": {
+        "start_inclusive": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/utcTimestamp"},
+        "end_exclusive": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/noneOrTimestamp"}
+      }
+    },
+    "contradiction_set_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"}
+  }
+}

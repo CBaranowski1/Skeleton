@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/market-sports-event-payload.schema.json",
+  "title": "Sports Event Contract Payload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "contract_id",
+    "governing_body_id",
+    "event_id",
+    "participants",
+    "scheduled_at",
+    "result_source_id",
+    "result_revision",
+    "outcomes",
+    "payout_basis_id",
+    "resolution_cutoff",
+    "rule_id",
+    "dispute_state",
+    "settlement_basis_id",
+    "lifecycle_state"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "skeleton.market-sports-event-payload.v1"
+    },
+    "contract_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "governing_body_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "event_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "participants": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+      }
+    },
+    "scheduled_at": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"
+    },
+    "result_source_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "result_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "outcomes": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "payout_basis_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "resolution_cutoff": {
+      "$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"
+    },
+    "rule_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "dispute_state": {
+      "enum": [
+        "none",
+        "open",
+        "resolved"
+      ]
+    },
+    "settlement_basis_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "lifecycle_state": {
+      "enum": [
+        "listed",
+        "open",
+        "halted",
+        "unavailable",
+        "postponed",
+        "cancelled",
+        "expired",
+        "voided",
+        "corrected",
+        "disputed",
+        "settled"
+      ]
+    }
+  }
+}

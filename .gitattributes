@@ -1,0 +1,46 @@
+* text=auto
+
+*.c text eol=lf
+*.cpp text eol=lf
+*.css text eol=lf
+*.csv text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+*.html text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.lock text eol=lf
+*.md text eol=lf
+*.mjs text eol=lf
+*.ps1 text eol=lf
+*.py text eol=lf
+*.rs text eol=lf
+*.sql text eol=lf
+*.toml text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.txt text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+*.7z -text
+*.bundle -text
+*.dll -text
+*.doc -text
+*.docx -text
+*.exe -text
+*.gz -text
+*.ico -text
+*.jpg -text
+*.jpeg -text
+*.pdf -text
+*.png -text
+*.pdb -text
+*.tar -text
+*.tgz -text
+*.webp -text
+*.zip -text

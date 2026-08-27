@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/lineage-record.schema.json",
+  "title": "Skeleton Closed Artifact Lineage Record v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "skeleton.lineage-record.v1"},
+    "lineage_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "subject_artifact_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "graph_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "nodes": {"type": "array"},
+    "edges": {"type": "array"},
+    "canonical_order": {}
+  },
+  "allOf": [{"$ref": "#/$defs/completeRecord"}],
+  "$defs": {
+    "nodeKind": {
+      "enum": ["outcome", "decision", "proposal", "model", "procedure", "feature", "dataset", "partition", "canonical_event", "raw_evidence", "derived_artifact", "memory", "backup", "manifest", "export"]
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "node_kind", "content_sha256", "rights_record_sha256", "rights_decision_sha256", "authentication", "quarantine"],
+      "properties": {
+        "artifact_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "node_kind": {"enum": ["outcome", "decision", "proposal", "model", "procedure", "feature", "dataset", "partition", "canonical_event", "raw_evidence", "derived_artifact", "memory", "backup", "manifest", "export"]},
+        "content_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "rights_record_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "rights_decision_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "authentication": {"enum": ["verified", "unverified", "unknown"]},
+        "quarantine": {"enum": ["clean", "legacy", "synthetic", "stale", "revoked_rights", "contaminated"]}
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["edge_kind", "from", "from_kind", "to", "to_kind"],
+      "properties": {
+        "edge_kind": {"enum": ["supported_by", "derived_from", "produced_by", "trained_on", "partition_of", "materialized_from", "backed_up_as", "manifested_by", "exported_as"]},
+        "from": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "from_kind": {"$ref": "#/$defs/nodeKind"},
+        "to": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "to_kind": {"$ref": "#/$defs/nodeKind"}
+      },
+      "allOf": [
+        {"if": {"properties": {"edge_kind": {"const": "supported_by"}}}, "then": {"properties": {"from_kind": {"enum": ["outcome", "decision"]}, "to_kind": {"enum": ["proposal", "model", "procedure", "feature", "dataset", "partition", "canonical_event", "raw_evidence"]}}}},
+        {"if": {"properties": {"edge_kind": {"const": "partition_of"}}}, "then": {"properties": {"from_kind": {"const": "partition"}, "to_kind": {"const": "dataset"}}}},
+        {"if": {"properties": {"edge_kind": {"const": "backed_up_as"}}}, "then": {"properties": {"to_kind": {"const": "backup"}}}},
+        {"if": {"properties": {"edge_kind": {"const": "manifested_by"}}}, "then": {"properties": {"to_kind": {"const": "manifest"}}}},
+        {"if": {"properties": {"edge_kind": {"const": "exported_as"}}}, "then": {"properties": {"to_kind": {"const": "export"}}}},
+        {"if": {"properties": {"edge_kind": {"const": "trained_on"}}}, "then": {"properties": {"from_kind": {"const": "model"}, "to_kind": {"enum": ["feature", "dataset", "partition", "canonical_event", "raw_evidence"]}}}}
+      ]
+    },
+    "canonicalOrder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodes", "edges"],
+      "properties": {
+        "nodes": {"const": ["artifact_id"]},
+        "edges": {"const": ["from", "edge_kind", "to"]}
+      }
+    },
+    "completeRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "lineage_id", "subject_artifact_id", "graph_sha256", "nodes", "edges", "canonical_order"],
+      "properties": {
+        "schema_version": {"const": "skeleton.lineage-record.v1"},
+        "lineage_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "subject_artifact_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "graph_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "nodes": {"type": "array", "minItems": 1, "maxItems": 65536, "items": {"$ref": "#/$defs/node"}},
+        "edges": {"type": "array", "maxItems": 262144, "items": {"$ref": "#/$defs/edge"}},
+        "canonical_order": {"$ref": "#/$defs/canonicalOrder"}
+      }
+    }
+  }
+}

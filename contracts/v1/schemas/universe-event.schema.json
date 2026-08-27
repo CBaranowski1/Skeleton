@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/universe-event.schema.json",
+  "title": "Skeleton Point-in-Time Universe Event v1",
+  "description": "An append-only visible-prefix universe fact retaining entry, exit, delisting, unavailability, restoration, and rename history.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "universe_id",
+    "stable_identity_id",
+    "action",
+    "reason",
+    "effective_at",
+    "available_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "skeleton.universe-event.v1"
+    },
+    "event_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "universe_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "stable_identity_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "action": {
+      "enum": [
+        "delist",
+        "enter",
+        "exit",
+        "rename",
+        "restore",
+        "unavailable"
+      ]
+    },
+    "reason": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"
+    },
+    "effective_at": {
+      "$ref": "#/$defs/normalizedTimestamp"
+    },
+    "available_at": {
+      "$ref": "#/$defs/normalizedTimestamp"
+    },
+    "supersedes_event_id": {
+      "oneOf": [
+        {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "normalizedTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?Z$"
+    }
+  }
+}

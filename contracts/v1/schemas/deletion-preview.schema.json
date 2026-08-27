@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/deletion-preview.schema.json",
+  "title": "Skeleton Non-Mutating Deletion Preview v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "skeleton.deletion-preview.v1"},
+    "preview_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "preview_bytes_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "subject_content_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "graph_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "pre_state_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "descendant_classes": {"type": "array"},
+    "descendants": {"type": "array"},
+    "blockers": {"type": "array"},
+    "holds": {"type": "array"},
+    "backup_requirements": {"type": "array"},
+    "canonical_order": {}
+  },
+  "allOf": [{"$ref": "#/$defs/completePreview"}],
+  "$defs": {
+    "descendantClass": {"enum": ["backup", "derived_artifact", "export", "manifest", "memory", "model", "raw_evidence"]},
+    "descendantClasses": {"const": ["backup", "derived_artifact", "export", "manifest", "memory", "model", "raw_evidence"]},
+    "descendant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ordinal", "artifact_id", "class", "content_sha256"],
+      "properties": {
+        "ordinal": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "artifact_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "class": {"$ref": "#/$defs/descendantClass"},
+        "content_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"}
+      }
+    },
+    "blocker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "subject_id"],
+      "properties": {
+        "code": {"enum": ["lineage_incomplete", "lineage_ambiguous", "hold_state_unknown", "backup_disposition_unknown", "rights_state_unknown", "pre_state_unavailable"]},
+        "subject_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"}
+      }
+    },
+    "hold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hold_id", "subject_id", "state"],
+      "properties": {
+        "hold_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "subject_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "state": {"enum": ["active", "clear", "unknown"]}
+      }
+    },
+    "backupRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "disposition"],
+      "properties": {
+        "artifact_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "disposition": {"enum": ["destroy_authorized_copy", "retain_under_hold", "not_applicable", "unknown"]}
+      }
+    },
+    "canonicalOrder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["descendant_classes", "descendants", "blockers", "holds", "backup_requirements"],
+      "properties": {
+        "descendant_classes": {"const": ["class"]},
+        "descendants": {"const": ["class", "artifact_id"]},
+        "blockers": {"const": ["code", "subject_id"]},
+        "holds": {"const": ["hold_id"]},
+        "backup_requirements": {"const": ["artifact_id", "disposition"]}
+      }
+    },
+    "completePreview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "preview_id", "preview_bytes_sha256", "subject_content_sha256", "graph_sha256", "pre_state_sha256", "descendant_classes", "descendants", "blockers", "holds", "backup_requirements", "canonical_order"],
+      "properties": {
+        "schema_version": {"const": "skeleton.deletion-preview.v1"},
+        "preview_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "preview_bytes_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "subject_content_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "graph_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "pre_state_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "descendant_classes": {"$ref": "#/$defs/descendantClasses"},
+        "descendants": {"type": "array", "maxItems": 262144, "items": {"$ref": "#/$defs/descendant"}},
+        "blockers": {"type": "array", "maxItems": 65536, "items": {"$ref": "#/$defs/blocker"}},
+        "holds": {"type": "array", "maxItems": 65536, "items": {"$ref": "#/$defs/hold"}},
+        "backup_requirements": {"type": "array", "maxItems": 65536, "items": {"$ref": "#/$defs/backupRequirement"}},
+        "canonical_order": {"$ref": "#/$defs/canonicalOrder"}
+      }
+    }
+  }
+}

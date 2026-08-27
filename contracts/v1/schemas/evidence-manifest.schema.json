@@ -1,0 +1,709 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/evidence-manifest.schema.json",
+  "title": "Skeleton Exact Evidence Manifest v1",
+  "description": "A strict content-addressed rebuild recipe binding every raw, temporal, rights, schema, code, environment, compression, correction, exclusion, and output identity. The sole incomplete shape is the exact frozen Wave 0 audit vector; every other identity must satisfy the complete profile.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {},
+    "manifest_id": {},
+    "objects": {},
+    "partitions": {},
+    "schema_bindings": {},
+    "calendar_facts": {},
+    "identities": {},
+    "universe_events": {},
+    "reference_facts": {},
+    "corrections": {},
+    "exclusions": {},
+    "rights_decisions": {},
+    "rights_bindings": {},
+    "code": {},
+    "compression": {},
+    "reconstruction": {},
+    "outputs": {},
+    "canonical_order": {}
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/frozenWave0AuditVector"
+    },
+    {
+      "$ref": "#/$defs/completeManifest"
+    }
+  ],
+  "$defs": {
+    "frozenWave0AuditVector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "manifest_id",
+        "objects",
+        "partitions",
+        "schema_bindings",
+        "identities",
+        "reference_facts",
+        "corrections",
+        "exclusions",
+        "rights_decisions",
+        "code"
+      ],
+      "properties": {
+        "schema_version": {},
+        "manifest_id": {},
+        "objects": {},
+        "partitions": {},
+        "schema_bindings": {},
+        "identities": {},
+        "reference_facts": {},
+        "corrections": {},
+        "exclusions": {},
+        "rights_decisions": {},
+        "code": {}
+      },
+      "const": {
+        "code": {
+          "build_id": "phase07-build-1",
+          "parser_code_sha256": "4242424242424242424242424242424242424242424242424242424242424242",
+          "source_commit": "0123456789abcdef0123456789abcdef01234567"
+        },
+        "corrections": [],
+        "exclusions": [],
+        "identities": [
+          "4343434343434343434343434343434343434343434343434343434343434343"
+        ],
+        "manifest_id": "4444444444444444444444444444444444444444444444444444444444444444",
+        "objects": [
+          "4545454545454545454545454545454545454545454545454545454545454545"
+        ],
+        "partitions": [
+          "2026-08-01"
+        ],
+        "reference_facts": [
+          "4646464646464646464646464646464646464646464646464646464646464646"
+        ],
+        "rights_decisions": [
+          "4747474747474747474747474747474747474747474747474747474747474747"
+        ],
+        "schema_bindings": [
+          {
+            "schema_id": "https://schemas.skeleton.local/v1/canonical-event.schema.json",
+            "sha256": "4848484848484848484848484848484848484848484848484848484848484848"
+          }
+        ],
+        "schema_version": "skeleton.evidence-manifest.v1"
+      }
+    },
+    "completeManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "manifest_id",
+        "objects",
+        "partitions",
+        "schema_bindings",
+        "calendar_facts",
+        "identities",
+        "universe_events",
+        "reference_facts",
+        "corrections",
+        "exclusions",
+        "rights_bindings",
+        "code",
+        "compression",
+        "reconstruction",
+        "outputs",
+        "canonical_order"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "skeleton.evidence-manifest.v1"
+        },
+        "manifest_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "objects": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/objectBinding"
+          }
+        },
+        "partitions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/partitionBinding"
+          }
+        },
+        "schema_bindings": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/schemaBinding"
+          }
+        },
+        "calendar_facts": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/calendarBinding"
+          }
+        },
+        "identities": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identityBinding"
+          }
+        },
+        "universe_events": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+          }
+        },
+        "reference_facts": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/referenceBinding"
+          }
+        },
+        "corrections": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/correctionBinding"
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/exclusionBinding"
+          }
+        },
+        "rights_bindings": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/rightsBinding"
+          }
+        },
+        "code": {
+          "$ref": "#/$defs/codeBinding"
+        },
+        "compression": {
+          "$ref": "#/$defs/compressionBinding"
+        },
+        "reconstruction": {
+          "$ref": "#/$defs/reconstructionBinding"
+        },
+        "outputs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/outputBinding"
+          }
+        },
+        "canonical_order": {
+          "$ref": "#/$defs/canonicalOrder"
+        }
+      }
+    },
+    "objectBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "content_sha256",
+        "byte_length",
+        "media_type"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "auxiliary",
+            "canonical",
+            "raw"
+          ]
+        },
+        "content_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "byte_length": {
+          "allOf": [
+            {
+              "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/safeInteger"
+            },
+            {
+              "minimum": 0
+            }
+          ]
+        },
+        "media_type": {
+          "enum": [
+            "application/json",
+            "application/jsonl",
+            "application/octet-stream"
+          ]
+        }
+      }
+    },
+    "outputBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "content_sha256",
+        "byte_length",
+        "media_type"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "dataset",
+            "index",
+            "partition"
+          ]
+        },
+        "content_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "byte_length": {
+          "allOf": [
+            {
+              "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/safeInteger"
+            },
+            {
+              "minimum": 0
+            }
+          ]
+        },
+        "media_type": {
+          "enum": [
+            "application/json",
+            "application/jsonl",
+            "application/octet-stream"
+          ]
+        }
+      }
+    },
+    "partitionBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "partition_key",
+        "content_sha256",
+        "ordinal"
+      ],
+      "properties": {
+        "partition_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._=-]*$"
+        },
+        "content_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "ordinal": {
+          "allOf": [
+            {
+              "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/safeInteger"
+            },
+            {
+              "minimum": 0
+            }
+          ]
+        }
+      }
+    },
+    "schemaBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_id",
+        "sha256"
+      ],
+      "properties": {
+        "schema_id": {
+          "type": "string",
+          "pattern": "^https://schemas\\.skeleton\\.local/v[1-9][0-9]*/[a-z0-9-]+\\.schema\\.json$"
+        },
+        "sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "calendarBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "calendar_id",
+        "effective_from",
+        "content_sha256"
+      ],
+      "properties": {
+        "calendar_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"
+        },
+        "effective_from": {
+          "$ref": "#/$defs/normalizedTimestamp"
+        },
+        "content_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "identityBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "stable_identity_id",
+        "effective_from",
+        "content_sha256"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "identity_fact",
+            "stable_identity"
+          ]
+        },
+        "stable_identity_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "effective_from": {
+          "$ref": "#/$defs/normalizedTimestamp"
+        },
+        "content_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "referenceBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "stable_identity_id",
+        "effective_from",
+        "content_sha256"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "calendar",
+            "currency",
+            "lifecycle",
+            "settlement",
+            "timezone",
+            "unit"
+          ]
+        },
+        "stable_identity_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "effective_from": {
+          "$ref": "#/$defs/normalizedTimestamp"
+        },
+        "content_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "correctionBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "superseded_id",
+        "correction_id"
+      ],
+      "properties": {
+        "superseded_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "correction_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "exclusionBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reason_code",
+        "subject_id"
+      ],
+      "properties": {
+        "reason_code": {
+          "enum": [
+            "contaminated",
+            "legacy",
+            "revoked_rights",
+            "stale",
+            "synthetic",
+            "unresolved_identity",
+            "unresolved_reference"
+          ]
+        },
+        "subject_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "rightsBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rights_record_id",
+        "rights_decision_id"
+      ],
+      "properties": {
+        "rights_record_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "rights_decision_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "codeBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_commit",
+        "parser",
+        "build",
+        "environment"
+      ],
+      "properties": {
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "parser": {
+          "$ref": "#/$defs/parserBinding"
+        },
+        "build": {
+          "$ref": "#/$defs/buildBinding"
+        },
+        "environment": {
+          "$ref": "#/$defs/environmentBinding"
+        }
+      }
+    },
+    "parserBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "code_sha256"
+      ],
+      "properties": {
+        "version": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"
+        },
+        "code_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "buildBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "build_id",
+        "toolchain_sha256"
+      ],
+      "properties": {
+        "build_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"
+        },
+        "toolchain_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "environmentBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "profile_sha256"
+      ],
+      "properties": {
+        "profile_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"
+        },
+        "profile_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "compressionBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "codec",
+        "parameters_sha256"
+      ],
+      "properties": {
+        "codec": {
+          "enum": [
+            "content_addressed_deduplication",
+            "delta",
+            "none"
+          ]
+        },
+        "parameters_sha256": {
+          "oneOf": [
+            {
+              "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "reconstructionBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm_version",
+        "recipe_sha256",
+        "preserves_raw_identity",
+        "preserves_rights_lineage",
+        "preserves_correction_history"
+      ],
+      "properties": {
+        "algorithm_version": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"
+        },
+        "recipe_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "preserves_raw_identity": {
+          "const": true
+        },
+        "preserves_rights_lineage": {
+          "const": true
+        },
+        "preserves_correction_history": {
+          "const": true
+        }
+      }
+    },
+    "canonicalOrder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objects",
+        "partitions",
+        "schema_bindings",
+        "calendar_facts",
+        "identities",
+        "universe_events",
+        "reference_facts",
+        "corrections",
+        "exclusions",
+        "rights_bindings",
+        "outputs"
+      ],
+      "properties": {
+        "objects": {
+          "const": [
+            "role",
+            "content_sha256"
+          ]
+        },
+        "partitions": {
+          "const": [
+            "partition_key",
+            "content_sha256"
+          ]
+        },
+        "schema_bindings": {
+          "const": [
+            "schema_id",
+            "sha256"
+          ]
+        },
+        "calendar_facts": {
+          "const": [
+            "calendar_id",
+            "effective_from",
+            "content_sha256"
+          ]
+        },
+        "identities": {
+          "const": [
+            "kind",
+            "stable_identity_id",
+            "effective_from",
+            "content_sha256"
+          ]
+        },
+        "universe_events": {
+          "const": [
+            "content_sha256"
+          ]
+        },
+        "reference_facts": {
+          "const": [
+            "kind",
+            "stable_identity_id",
+            "effective_from",
+            "content_sha256"
+          ]
+        },
+        "corrections": {
+          "const": [
+            "superseded_id",
+            "correction_id"
+          ]
+        },
+        "exclusions": {
+          "const": [
+            "reason_code",
+            "subject_id"
+          ]
+        },
+        "rights_bindings": {
+          "const": [
+            "rights_record_id",
+            "rights_decision_id"
+          ]
+        },
+        "outputs": {
+          "const": [
+            "role",
+            "content_sha256"
+          ]
+        }
+      }
+    },
+    "normalizedTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?Z$"
+    }
+  }
+}

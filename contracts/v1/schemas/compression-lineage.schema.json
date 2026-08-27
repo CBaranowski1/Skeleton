@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/compression-lineage.schema.json",
+  "title": "Skeleton Compression Lineage Chain v1",
+  "description": "Content-addressed parent chain for one metabolism child document: a sorted unique tuple of canonical parent identities (empty for genesis), the producing closed pipeline stage, and the sealing gate-receipt identity for any replacement edge; no free-text lineage narration exists.",
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE12_LINEAGE_V1",
+  "x-skeleton-sorted-inventories": ["parent_ids"],
+  "$defs": {
+    "pipelineStage": {
+      "enum": [
+        "lossless_deduplication",
+        "semantic_delta_encoding",
+        "prototype_exception_clustering",
+        "crystallization",
+        "retention_scoring",
+        "pressure_pruning"
+      ]
+    },
+    "lineageCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "lineage_id",
+        "child_id",
+        "parent_ids",
+        "producing_stage",
+        "gate_receipt_id"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.compression-lineage.v1"},
+        "record_type": {"const": "compression_lineage"},
+        "lineage_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "child_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "parent_ids": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/hashInventory"},
+        "producing_stage": {"$ref": "#/$defs/pipelineStage"},
+        "gate_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "allOf": [
+        {"$ref": "#/$defs/lineageCommon"},
+        {
+          "x-skeleton-edge-kind": "genesis",
+          "properties": {
+            "parent_ids": {"maxItems": 0},
+            "gate_receipt_id": {"const": "none"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/lineageCommon"},
+        {
+          "x-skeleton-edge-kind": "replacement",
+          "properties": {
+            "parent_ids": {"minItems": 1},
+            "gate_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+          }
+        }
+      ]
+    }
+  ]
+}

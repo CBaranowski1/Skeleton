@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/agent-objection.schema.json",
+  "title": "Skeleton Independent Agent Falsification Record v1",
+  "description": "A closed authority-free falsifier assessment with complete challenges and independently evidenced objection dispositions.",
+  "type": "object",
+  "additionalProperties": false,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-sorted-inventories": [
+    "rejection_tests.rejection_test_id",
+    "evidence_gaps.evidence_gap_id",
+    "objections.objection_id",
+    "independent_dispositions.objection_id"
+  ],
+  "x-skeleton-exact-counters": [
+    ["rejection_test_count", "rejection_tests"],
+    ["evidence_gap_count", "evidence_gaps"],
+    ["objection_count", "objections"],
+    ["independent_disposition_count", "independent_dispositions"]
+  ],
+  "x-skeleton-distinct-fields": [
+    ["candidate_context_id", "falsifier_context_id"],
+    ["candidate_capability_root", "falsifier_capability_root"]
+  ],
+  "required": [
+    "schema_version",
+    "record_type",
+    "objection_set_id",
+    "invocation_id",
+    "candidate_output_root",
+    "candidate_context_id",
+    "candidate_capability_root",
+    "falsifier_context_id",
+    "falsifier_capability_root",
+    "eligible_evidence_root",
+    "strongest_competing_explanation",
+    "leakage_challenge",
+    "cost_challenge",
+    "crowding_challenge",
+    "rejection_tests",
+    "evidence_gaps",
+    "objections",
+    "independent_dispositions",
+    "rejection_test_count",
+    "evidence_gap_count",
+    "objection_count",
+    "independent_disposition_count",
+    "material_unresolved_count",
+    "disposition_root",
+    "recorded_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.agent-objection.v1"},
+    "record_type": {"const": "falsifier_assessment"},
+    "objection_set_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "candidate_output_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "candidate_context_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "candidate_capability_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "falsifier_context_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "falsifier_capability_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "eligible_evidence_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "strongest_competing_explanation": {"$ref": "#/$defs/boundedStatement"},
+    "leakage_challenge": {"$ref": "#/$defs/boundedStatement"},
+    "cost_challenge": {"$ref": "#/$defs/boundedStatement"},
+    "crowding_challenge": {"$ref": "#/$defs/boundedStatement"},
+    "rejection_tests": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "rejection_test_id_lexicographic",
+      "items": {"$ref": "#/$defs/rejectionTest"}
+    },
+    "evidence_gaps": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "evidence_gap_id_lexicographic",
+      "items": {"$ref": "#/$defs/evidenceGap"}
+    },
+    "objections": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "objection_id_lexicographic",
+      "items": {"$ref": "#/$defs/objection"}
+    },
+    "independent_dispositions": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "objection_id_lexicographic",
+      "items": {"$ref": "#/$defs/independentDisposition"}
+    },
+    "rejection_test_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+    "evidence_gap_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "objection_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "independent_disposition_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "material_unresolved_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "disposition_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "recorded_at": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/utcTimestamp"}
+  },
+  "$defs": {
+    "boundedStatement": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "rejectionTest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rejection_test_id", "hypothesis_root", "test_kind", "evidence_requirement_root"],
+      "properties": {
+        "rejection_test_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "hypothesis_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "test_kind": {"enum": ["deterministic_outcome", "counterfactual", "holdout", "cost_stress", "crowding_stress", "leakage_probe"]},
+        "evidence_requirement_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+      }
+    },
+    "evidenceGap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_gap_id", "evidence_class", "reason", "materiality"],
+      "properties": {
+        "evidence_gap_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "evidence_class": {"enum": ["source", "rights", "lineage", "temporal", "cost", "liquidity", "outcome", "independent_verification"]},
+        "reason": {"$ref": "#/$defs/boundedStatement"},
+        "materiality": {"enum": ["material", "non_material"]}
+      }
+    },
+    "objection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objection_id", "category", "claim_root", "materiality", "resolution"],
+      "properties": {
+        "objection_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "category": {"enum": ["competing_explanation", "leakage", "cost", "crowding", "rejection_test", "evidence_gap", "independence"]},
+        "claim_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "materiality": {"enum": ["material", "non_material"]},
+        "resolution": {"enum": ["resolved", "unresolved"]}
+      }
+    },
+    "independentDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-skeleton-forbids-candidate-verifier": true,
+      "required": [
+        "disposition_id",
+        "objection_id",
+        "verifier_kind",
+        "verifier_evidence_id",
+        "verifier_context_id",
+        "verifier_capability_root",
+        "materiality",
+        "resolution",
+        "resolution_reason"
+      ],
+      "properties": {
+        "disposition_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "objection_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "verifier_kind": {"enum": ["deterministic_outcome", "independent_verifier", "owner_signal", "explicit_unresolved"]},
+        "verifier_evidence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "verifier_context_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "verifier_capability_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "materiality": {"enum": ["material", "non_material"]},
+        "resolution": {"enum": ["resolved", "unresolved"]},
+        "resolution_reason": {"enum": ["rejection_test_passed", "rejection_test_failed", "evidence_supplied", "owner_resolved", "evidence_still_missing", "independence_not_established"]}
+      }
+    }
+  }
+}

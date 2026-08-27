@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/pending-owner-hardware.schema.json",
+  "title": "Skeleton Pending Owner Hardware Placeholder v1",
+  "description": "The typed enumerable D-18 hardware-honesty placeholder: one row per requirement facet that cannot be discharged without owner hardware, carrying the closed reason enum, the closed bound requirement facet structurally pinned to its exact replay obligation, the bound artifact identity, and the conformance oracle root a future owner hardware run must reproduce; the schema admits no status, satisfied, waived, or retirement field of any kind — only an owner hardware-verification event outside this document can retire a placeholder, and no fixture may masquerade as a real training run or real-model measurement.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE13_PLACEHOLDER",
+  "x-skeleton-cross-field": [
+    "release evidence MUST enumerate every placeholder row; the expected placeholder count is nonzero until owner hardware verification retires each row (D-22)"
+  ],
+  "$defs": {
+    "replayObligation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["obligation_kind", "conformance_oracle_root", "expected_receipt_count"],
+      "properties": {
+        "obligation_kind": {
+          "enum": [
+            "reproduce_training_step_receipts",
+            "reproduce_probe_receipt",
+            "reproduce_kl_drift_measurement",
+            "reproduce_fixture_conformance_receipts"
+          ]
+        },
+        "conformance_oracle_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "expected_receipt_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"}
+      }
+    },
+    "placeholderCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "schema_domain",
+        "placeholder_id",
+        "reason",
+        "bound_requirement",
+        "bound_artifact_id",
+        "replay_obligation",
+        "recorded_ordinal"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.pending-owner-hardware.v1"},
+        "record_type": {"const": "pending_owner_hardware"},
+        "schema_domain": {"const": "SKELETON_PHASE13_PLACEHOLDER"},
+        "placeholder_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "reason": {
+          "enum": ["dgx_absent", "owner_authorization_pending", "arm64_parity_unverified"]
+        },
+        "bound_requirement": {
+          "enum": [
+            "real_training_run",
+            "real_model_probe",
+            "real_model_kl_drift",
+            "provider_conformance"
+          ]
+        },
+        "bound_artifact_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "replay_obligation": {"$ref": "#/$defs/replayObligation"},
+        "recorded_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+      }
+    }
+  },
+  "allOf": [
+    {"$ref": "#/$defs/placeholderCommon"},
+    {
+      "x-skeleton-constraint": "requirement_obligation_binding",
+      "oneOf": [
+        {
+          "properties": {
+            "bound_requirement": {"const": "real_training_run"},
+            "replay_obligation": {
+              "properties": {"obligation_kind": {"const": "reproduce_training_step_receipts"}}
+            }
+          }
+        },
+        {
+          "properties": {
+            "bound_requirement": {"const": "real_model_probe"},
+            "replay_obligation": {
+              "properties": {"obligation_kind": {"const": "reproduce_probe_receipt"}}
+            }
+          }
+        },
+        {
+          "properties": {
+            "bound_requirement": {"const": "real_model_kl_drift"},
+            "replay_obligation": {
+              "properties": {"obligation_kind": {"const": "reproduce_kl_drift_measurement"}}
+            }
+          }
+        },
+        {
+          "properties": {
+            "bound_requirement": {"const": "provider_conformance"},
+            "replay_obligation": {
+              "properties": {"obligation_kind": {"const": "reproduce_fixture_conformance_receipts"}}
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

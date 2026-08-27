@@ -1,0 +1,52 @@
+name: Feature proposal
+description: Propose a bounded capability or improvement.
+title: '[Proposal] '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Skeleton favors measured usefulness and narrow authority boundaries.
+        Large rewrites, new services, and new languages need evidence that an
+        existing boundary cannot meet a named requirement.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What owner-visible problem or failed requirement needs solving?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Bounded proposal
+      description: Describe the smallest change that could solve the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and success measure
+      description: What reproducible test, benchmark, or evaluation proves value?
+    validations:
+      required: true
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Authority, data, and failure boundaries
+      description: Identify permissions, inputs, outputs, persistence, rollback, and denial behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include the option to simplify or avoid the change.
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: This proposal does not add live-money, custody, signing, withdrawal, or wager authority.
+          required: true
+        - label: This proposal contains no secrets, personal paths, or private evidence.
+          required: true

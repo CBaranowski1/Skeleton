@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/agent-incident.schema.json",
+  "title": "Skeleton Metadata-Only Agent Incident v1",
+  "description": "A bounded safety or recovery incident that records only detector metadata, disposition, lineage, retention, and a nonsecret nonce.",
+  "type": "object",
+  "additionalProperties": false,
+  "x-skeleton-metadata-only": true,
+  "x-skeleton-authority-free": true,
+  "required": [
+    "schema_version",
+    "record_type",
+    "incident_id",
+    "invocation_id",
+    "lifecycle_event_id",
+    "source_identity",
+    "category",
+    "detector_version",
+    "rule_id",
+    "boundary",
+    "disposition",
+    "lineage_root",
+    "prior_incident_id",
+    "nonce",
+    "retention_disposition",
+    "external_effect_count",
+    "recorded_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.agent-incident.v1"},
+    "record_type": {"const": "agent_incident"},
+    "incident_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "lifecycle_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "source_identity": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "category": {
+      "enum": [
+        "prompt_injection",
+        "memory_poisoning",
+        "tool_manipulation",
+        "exfiltration",
+        "malicious_document",
+        "indirect_instruction",
+        "credential",
+        "private_data",
+        "canary",
+        "secret",
+        "stale_fence",
+        "lifecycle_violation",
+        "budget_violation",
+        "provider_substitution"
+      ]
+    },
+    "detector_version": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/schemaVersion"},
+    "rule_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/identifier"},
+    "boundary": {
+      "enum": [
+        "input",
+        "context",
+        "tool_argument",
+        "tool_result",
+        "model_output",
+        "organ_result",
+        "memory_write",
+        "log",
+        "diagnostic",
+        "export",
+        "crash_record",
+        "lifecycle_append"
+      ]
+    },
+    "disposition": {
+      "enum": [
+        "abstained",
+        "quarantined",
+        "rejected_before_persistence",
+        "source_quarantined",
+        "attempt_abandoned",
+        "adapter_quarantined"
+      ]
+    },
+    "lineage_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "prior_incident_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+    "nonce": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "retention_disposition": {
+      "enum": ["retain_audit_metadata", "quarantine_pending_review"]
+    },
+    "external_effect_count": {"const": 0},
+    "recorded_at": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/utcTimestamp"}
+  }
+}

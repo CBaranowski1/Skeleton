@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/market-cash-equity-payload.schema.json",
+  "title": "Skeleton Listed Cash Equity Payload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "venue", "currency", "unit", "bid", "ask", "bid_size", "ask_size", "session"],
+  "properties": {
+    "schema_version": {"const": "skeleton.market-cash-equity-payload.v1"},
+    "venue": {"const": "xnys"},
+    "currency": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/currency"},
+    "unit": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/unit"},
+    "bid": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/positiveDecimal"},
+    "ask": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/positiveDecimal"},
+    "bid_size": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/positiveDecimal"},
+    "ask_size": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/positiveDecimal"},
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["calendar", "state", "tzdb_zone", "source_local", "source_utc"],
+      "properties": {
+        "calendar": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/calendar"},
+        "state": {"enum": ["regular", "closed"]},
+        "tzdb_zone": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/tzdbZone"},
+        "source_local": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/localTimestamp"},
+        "source_utc": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"}
+      }
+    }
+  }
+}

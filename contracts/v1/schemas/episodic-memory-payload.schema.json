@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/episodic-memory-payload.schema.json",
+  "title": "Skeleton Immutable Episodic Memory Payload v1",
+  "description": "Closed prediction-through-counterfactual episode evidence that never asserts semantic truth by presence.",
+  "type": "object",
+  "additionalProperties": false,
+  "x-skeleton-sorted-inventories": ["evidence_ids"],
+  "required": [
+    "schema_version",
+    "episode_id",
+    "event_id",
+    "event_type",
+    "occurred_at",
+    "evidence_ids",
+    "subject_id",
+    "related_event_id"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.episodic-memory-payload.v1"},
+    "episode_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "event_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "event_type": {
+      "enum": ["prediction", "abstention", "decision", "intervention", "outcome", "error", "counterfactual"]
+    },
+    "occurred_at": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/utcTimestamp"},
+    "evidence_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/nonemptyHashInventory"},
+    "subject_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "related_event_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/noneOrSha256"}
+  }
+}

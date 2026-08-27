@@ -1,0 +1,15 @@
+{"expected_verdict":"reject","id":"value-future-available","rejection_code":"observation_future_available","schema_id":"https://schemas.skeleton.local/v1/market-join-decision.schema.json"}
+{"expected_verdict":"reject","id":"value-session-closed","rejection_code":"session_not_open","schema_id":"https://schemas.skeleton.local/v1/market-join-decision.schema.json"}
+{"expected_verdict":"reject","id":"value-session-halted","rejection_code":"session_not_open","schema_id":"https://schemas.skeleton.local/v1/market-join-decision.schema.json"}
+{"expected_verdict":"reject","id":"value-session-unknown","rejection_code":"session_not_open","schema_id":"https://schemas.skeleton.local/v1/market-join-decision.schema.json"}
+{"expected_verdict":"reject","id":"value-stale","rejection_code":"observation_stale","schema_id":"https://schemas.skeleton.local/v1/market-join-decision.schema.json"}
+{"expected_verdict":"reject","id":"value-open-interval","rejection_code":"interval_not_closed","schema_id":"https://schemas.skeleton.local/v1/market-join-decision.schema.json"}
+{"expected_verdict":"reject","id":"value-horizon-mismatch","rejection_code":"horizon_mismatch","schema_id":"https://schemas.skeleton.local/v1/market-join-decision.schema.json"}
+{"expected_verdict":"reject","id":"value-conversion-missing","rejection_code":"conversion_invalid","schema_id":"https://schemas.skeleton.local/v1/market-conversion.schema.json"}
+{"expected_verdict":"reject","id":"value-conversion-expired","rejection_code":"conversion_invalid","schema_id":"https://schemas.skeleton.local/v1/market-conversion.schema.json"}
+{"expected_verdict":"reject","id":"value-conversion-pair-mismatch","rejection_code":"conversion_invalid","schema_id":"https://schemas.skeleton.local/v1/market-conversion.schema.json"}
+{"expected_verdict":"reject","id":"value-exposure-mismatch","rejection_code":"exposure_dimension_mismatch","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"reject","id":"value-forward-filled","rejection_code":"forward_fill_forbidden","schema_id":"https://schemas.skeleton.local/v1/market-join-decision.schema.json"}
+{"expected_verdict":"reject","id":"value-negative-zero","rejection_code":"decimal_noncanonical","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"reject","id":"value-exponent","rejection_code":"decimal_noncanonical","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"reject","id":"value-nan","rejection_code":"decimal_noncanonical","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}

@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/recall-regret.schema.json",
+  "title": "Skeleton Recall Regret Record v1",
+  "description": "Append-only post-outcome regret join of one sealed conductor packet identity and one outcome identity with the four closed regret classes and sorted unique class-tagged inventories referencing sealed identities only; no member can rewrite, re-rank, or amend the packet it joins.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE12_RECALL_REGRET_V1",
+  "x-skeleton-sorted-inventories": ["regret_entries.regret_class"],
+  "$defs": {
+    "regretClass": {
+      "enum": [
+        "missed_relevant",
+        "included_irrelevant",
+        "budget_starved",
+        "lens_absent"
+      ]
+    },
+    "nonemptyLensInventory": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 7,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "recall_lens_canonical_order",
+      "items": {"$ref": "https://schemas.skeleton.local/v1/recall-packet.schema.json#/$defs/recallLens"}
+    },
+    "memoryRegretEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["regret_class", "memory_ids"],
+      "properties": {
+        "regret_class": {"enum": ["missed_relevant", "included_irrelevant"]},
+        "memory_ids": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/nonemptyHashInventory"}
+      }
+    },
+    "lensRegretEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["regret_class", "lenses"],
+      "properties": {
+        "regret_class": {"enum": ["budget_starved", "lens_absent"]},
+        "lenses": {"$ref": "#/$defs/nonemptyLensInventory"}
+      }
+    },
+    "regretEntry": {
+      "oneOf": [
+        {"$ref": "#/$defs/memoryRegretEntry"},
+        {"$ref": "#/$defs/lensRegretEntry"}
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "regret_id",
+    "packet_id",
+    "outcome_id",
+    "fence_id",
+    "generation",
+    "attempt_ordinal",
+    "regret_entries"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.recall-regret.v1"},
+    "record_type": {"const": "recall_regret"},
+    "regret_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "packet_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "outcome_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+    "regret_entries": {
+      "type": "array",
+      "maxItems": 4,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "regret_class_canonical_order",
+      "x-skeleton-unique-fields": [["regret_class"]],
+      "items": {"$ref": "#/$defs/regretEntry"}
+    }
+  }
+}

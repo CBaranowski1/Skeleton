@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/simulation-report.schema.json",
+  "title": "Skeleton Deterministic Simulation Report v1",
+  "description": "Complete disclosure report retaining every input, exclusion, native market dimension, and non-success outcome.",
+  "type": "object",
+  "additionalProperties": false,
+  "x-skeleton-disjoint-inventories": [
+    ["admitted_inputs", "rights_excluded_inputs"]
+  ],
+  "x-skeleton-sorted-inventories": [
+    "candidate_inputs",
+    "admitted_inputs",
+    "rights_excluded_inputs"
+  ],
+  "required": [
+    "schema_version",
+    "report_id",
+    "manifest_id",
+    "status",
+    "successful",
+    "calibration_eligible",
+    "calibration_id",
+    "trace_root",
+    "candidate_inputs",
+    "admitted_inputs",
+    "rights_excluded_inputs",
+    "events",
+    "fills",
+    "costs",
+    "settlements",
+    "success_labels",
+    "missing_evidence",
+    "unresolved_outcomes",
+    "assumptions",
+    "sensitivities",
+    "clocks",
+    "currencies",
+    "collateral_bases",
+    "payoff_units",
+    "abstain_reasons",
+    "no_fill_reasons",
+    "rollback_reasons",
+    "corrections"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.simulation-report.v1"},
+    "report_id": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"},
+    "manifest_id": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"},
+    "status": {"enum": ["completed", "unresolved", "abstained", "rolled_back", "simulation_all_inputs_rights_excluded"]},
+    "successful": {"type": "boolean"},
+    "calibration_eligible": {"type": "boolean"},
+    "calibration_id": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"}
+      ]
+    },
+    "trace_root": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/sha256"}
+      ]
+    },
+    "candidate_inputs": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/nonemptyHashInventory"},
+    "admitted_inputs": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"},
+    "rights_excluded_inputs": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"},
+    "events": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"},
+    "fills": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"},
+    "costs": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"},
+    "settlements": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"},
+    "success_labels": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"},
+    "missing_evidence": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"},
+    "unresolved_outcomes": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"},
+    "assumptions": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/stringInventory"},
+    "sensitivities": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/stringInventory"},
+    "clocks": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/stringInventory"},
+    "currencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "x-skeleton-ordering": "lexicographic",
+      "items": {"type": "string", "pattern": "^[A-Z]{3}$"}
+    },
+    "collateral_bases": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/stringInventory"},
+    "payoff_units": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/stringInventory"},
+    "abstain_reasons": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/stringInventory"},
+    "no_fill_reasons": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/stringInventory"},
+    "rollback_reasons": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/stringInventory"},
+    "corrections": {"$ref": "https://schemas.skeleton.local/v1/simulation-primitives.schema.json#/$defs/hashInventory"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {"const": "simulation_all_inputs_rights_excluded"}
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "successful": {"const": false},
+          "calibration_eligible": {"const": false},
+          "calibration_id": {"type": "null"},
+          "trace_root": {"type": "null"},
+          "candidate_inputs": {"minItems": 1},
+          "admitted_inputs": {"maxItems": 0},
+          "rights_excluded_inputs": {"minItems": 1},
+          "events": {"maxItems": 0},
+          "fills": {"maxItems": 0},
+          "costs": {"maxItems": 0},
+          "settlements": {"maxItems": 0},
+          "success_labels": {"maxItems": 0},
+          "abstain_reasons": {
+            "contains": {"const": "all_inputs_rights_excluded"},
+            "minContains": 1,
+            "maxContains": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "admitted_inputs": {"minItems": 1},
+          "trace_root": {"type": "string"}
+        }
+      }
+    }
+  ]
+}
