@@ -1,0 +1,27 @@
+title = "Skeleton public secret-scanning policy"
+
+[extend]
+useDefault = true
+
+# These exact lines describe secret classifiers or deliberately synthetic
+# hostile inputs. The allowlist requires both an exact path and an exact line
+# shape; it does not exempt either file from other Gitleaks rules or matches.
+[[allowlists]]
+description = "Known structural generic-api-key false positives"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = [
+  '''^python/src/skeleton_kernel/agent_safety\.py$''',
+  '''^python/src/skeleton_kernel/memory_safety\.py$''',
+  '''^python/src/skeleton_kernel/reference_authority\.py$''',
+  '''^python/tests/memory/test_admission_safety\.py$''',
+  '''^python/tests/metabolism/test_residue\.py$''',
+]
+regexes = [
+  '''_reject\(AgentSafetyCategory\.SECRET, "reusable_secret_derivative_v1",''',
+  '''return SafetyCategory\.PRIVATE_KEY, "private_key_material_v1"''',
+  '''private_key: Ed25519PrivateKey''',
+  '''"handoff note: api_key=sk-test-1234567890"''',
+  '''"password = hunter2-secret-material"''',
+]

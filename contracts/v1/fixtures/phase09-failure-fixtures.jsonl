@@ -1,0 +1,12 @@
+{"expected_status":"abstained","expected_verdict":"accept","failure_kind":"disconnect","id":"failure-disconnect"}
+{"expected_status":"abstained","expected_verdict":"accept","failure_kind":"stale_book","id":"failure-stale-book"}
+{"expected_status":"unresolved","expected_verdict":"accept","failure_kind":"gap","id":"failure-gap"}
+{"expected_status":"abstained","expected_verdict":"accept","failure_kind":"halt","id":"failure-halt"}
+{"expected_status":"rolled_back","expected_verdict":"accept","failure_kind":"reorg","id":"failure-reorg"}
+{"expected_status":"unresolved","expected_verdict":"accept","failure_kind":"depeg","id":"failure-depeg"}
+{"expected_status":"abstained","expected_verdict":"accept","failure_kind":"suspension","id":"failure-suspension"}
+{"expected_status":"voided","expected_verdict":"accept","failure_kind":"void","id":"failure-void"}
+{"expected_status":"unresolved","expected_verdict":"accept","failure_kind":"delayed_resolution","id":"failure-delayed-resolution"}
+{"expected_status":"unresolved","expected_verdict":"accept","failure_kind":"dispute","id":"failure-dispute"}
+{"expected_status":"corrected","expected_verdict":"accept","failure_kind":"correction","id":"failure-correction"}
+{"expected_status":"abstained","expected_verdict":"accept","failure_kind":"venue_outage","id":"failure-venue-outage"}

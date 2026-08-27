@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/rights-use-request.schema.json",
+  "title": "Skeleton Rights Use Request v1",
+  "description": "An exact request for one independently evaluated rights boundary and destination.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "subject",
+    "evidence_sha256",
+    "boundary",
+    "processing_boundary",
+    "destination",
+    "requested_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "skeleton.rights-use-request.v1"
+    },
+    "request_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "subject": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"
+    },
+    "evidence_sha256": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "boundary": {
+      "$ref": "#/$defs/useBoundary"
+    },
+    "processing_boundary": {
+      "$ref": "#/$defs/processingBoundary"
+    },
+    "destination": {
+      "$ref": "#/$defs/destination"
+    },
+    "requested_at": {
+      "$ref": "#/$defs/normalizedTimestamp"
+    }
+  },
+  "$defs": {
+    "normalizedTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?Z$"
+    },
+    "useBoundary": {
+      "enum": [
+        "activation",
+        "backup",
+        "evaluation",
+        "export",
+        "ingest",
+        "prompt",
+        "retrieval",
+        "training"
+      ]
+    },
+    "processingBoundary": {
+      "enum": [
+        "approved_local_boundary",
+        "external_model",
+        "local_only"
+      ]
+    },
+    "destination": {
+      "enum": [
+        "approved_local_model",
+        "backup_repository",
+        "export_recipient",
+        "external_model",
+        "local_owner_system"
+      ]
+    }
+  }
+}

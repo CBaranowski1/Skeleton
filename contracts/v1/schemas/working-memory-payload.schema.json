@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/working-memory-payload.schema.json",
+  "title": "Skeleton One-Run Working Memory Payload v1",
+  "description": "Closed evidence, procedure, tool, model, budget, output, and terminal record for exactly one reproducible run.",
+  "type": "object",
+  "additionalProperties": false,
+  "x-skeleton-sorted-inventories": [
+    "admitted_evidence_ids",
+    "procedure_ids",
+    "tool_ids",
+    "model_ids",
+    "intermediate_ids",
+    "output_ids"
+  ],
+  "x-skeleton-budget-pairs": [
+    ["items_used", "item_budget"],
+    ["bytes_used", "byte_budget"]
+  ],
+  "required": [
+    "schema_version",
+    "run_id",
+    "run_manifest_id",
+    "admitted_evidence_ids",
+    "procedure_ids",
+    "tool_ids",
+    "model_ids",
+    "item_budget",
+    "byte_budget",
+    "items_used",
+    "bytes_used",
+    "intermediate_ids",
+    "output_ids",
+    "terminal_disposition"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.working-memory-payload.v1"},
+    "run_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "run_manifest_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "admitted_evidence_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/nonemptyHashInventory"},
+    "procedure_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+    "tool_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+    "model_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+    "item_budget": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/positiveInteger"},
+    "byte_budget": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/positiveInteger"},
+    "items_used": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "bytes_used": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "intermediate_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+    "output_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+    "terminal_disposition": {"enum": ["sealed", "discarded"]}
+  }
+}

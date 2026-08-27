@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/market-event-envelope.schema.json",
+  "title": "Skeleton Market Event Envelope v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "family",
+    "canonical_event_id",
+    "stable_identity_id",
+    "rights_record_id",
+    "rights_decision_id",
+    "payload_schema_id",
+    "payload_sha256",
+    "payload"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "skeleton.market-event-envelope.v1"
+    },
+    "family": {
+      "enum": [
+        "listed_cash_equity",
+        "listed_option",
+        "future",
+        "contingent_contract",
+        "sports_event_contract"
+      ]
+    },
+    "canonical_event_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "stable_identity_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "rights_record_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "rights_decision_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "payload_schema_id": {
+      "enum": [
+        "https://schemas.skeleton.local/v1/market-cash-equity-payload.schema.json",
+        "https://schemas.skeleton.local/v1/market-listed-option-payload.schema.json",
+        "https://schemas.skeleton.local/v1/market-future-payload.schema.json",
+        "https://schemas.skeleton.local/v1/market-contingent-payload.schema.json",
+        "https://schemas.skeleton.local/v1/market-sports-event-payload.schema.json"
+      ]
+    },
+    "payload_sha256": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "family": {
+            "const": "listed_cash_equity"
+          }
+        },
+        "required": [
+          "family"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload_schema_id": {
+            "const": "https://schemas.skeleton.local/v1/market-cash-equity-payload.schema.json"
+          },
+          "payload": {
+            "$ref": "https://schemas.skeleton.local/v1/market-cash-equity-payload.schema.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "family": {
+            "const": "listed_option"
+          }
+        },
+        "required": [
+          "family"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload_schema_id": {
+            "const": "https://schemas.skeleton.local/v1/market-listed-option-payload.schema.json"
+          },
+          "payload": {
+            "$ref": "https://schemas.skeleton.local/v1/market-listed-option-payload.schema.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "family": {
+            "const": "future"
+          }
+        },
+        "required": [
+          "family"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload_schema_id": {
+            "const": "https://schemas.skeleton.local/v1/market-future-payload.schema.json"
+          },
+          "payload": {
+            "$ref": "https://schemas.skeleton.local/v1/market-future-payload.schema.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "family": {
+            "const": "contingent_contract"
+          }
+        },
+        "required": [
+          "family"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload_schema_id": {
+            "const": "https://schemas.skeleton.local/v1/market-contingent-payload.schema.json"
+          },
+          "payload": {
+            "$ref": "https://schemas.skeleton.local/v1/market-contingent-payload.schema.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "family": {
+            "const": "sports_event_contract"
+          }
+        },
+        "required": [
+          "family"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload_schema_id": {
+            "const": "https://schemas.skeleton.local/v1/market-sports-event-payload.schema.json"
+          },
+          "payload": {
+            "$ref": "https://schemas.skeleton.local/v1/market-sports-event-payload.schema.json"
+          }
+        }
+      }
+    }
+  ]
+}

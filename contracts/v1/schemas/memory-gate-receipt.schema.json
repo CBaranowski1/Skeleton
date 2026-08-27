@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/memory-gate-receipt.schema.json",
+  "title": "Skeleton Compression Gate Receipt v1",
+  "description": "Five-gate replacement evidence for one compressed artifact over a seedless deterministic capsule sample: per-gate exact integer pass/fail counts, per-capsule compression-exempt outcomes, and a completeness constant that cannot coexist with a missing gate; no tombstone may commit without a complete receipt.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE12_GATE_RECEIPT_V1",
+  "x-skeleton-sorted-inventories": ["sample.sampled_capsule_ids", "gate_results.gate", "exemptions.capsule_id"],
+  "$defs": {
+    "compressionGate": {
+      "enum": [
+        "reconstruction",
+        "decision_replay",
+        "counterevidence_preservation",
+        "provenance",
+        "future_model_readability"
+      ]
+    },
+    "gateResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate", "passed_count", "failed_count", "verdict"],
+      "properties": {
+        "gate": {"$ref": "#/$defs/compressionGate"},
+        "passed_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "failed_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "verdict": {"enum": ["passed", "failed"]}
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "verdict": {"const": "passed"},
+            "failed_count": {"const": 0}
+          }
+        },
+        {
+          "properties": {
+            "verdict": {"const": "failed"},
+            "failed_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"}
+          }
+        }
+      ]
+    },
+    "sampleDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["derivation", "derivation_domain", "derivation_inputs", "sample_size", "sampled_capsule_ids"],
+      "properties": {
+        "derivation": {"const": "lowest_framed_digest"},
+        "derivation_domain": {"const": "SKELETON_PHASE12_GATE_SAMPLE_V1"},
+        "derivation_inputs": {"const": ["cycle_input_root", "capsule_id"]},
+        "sample_size": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "sampled_capsule_ids": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/nonemptyHashInventory"}
+      }
+    },
+    "exemptionOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capsule_id", "artifact_id", "outcome"],
+      "properties": {
+        "capsule_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "artifact_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "outcome": {"const": "compression_exempt"}
+      }
+    },
+    "receiptCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "gate_receipt_id",
+        "cycle_ordinal",
+        "cycle_input_root",
+        "fence_id",
+        "generation",
+        "attempt_ordinal",
+        "artifact_id",
+        "sample",
+        "gate_results",
+        "exemptions",
+        "completeness"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.memory-gate-receipt.v1"},
+        "record_type": {"const": "gate_receipt"},
+        "gate_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "cycle_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "cycle_input_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "artifact_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "sample": {"$ref": "#/$defs/sampleDeclaration"},
+        "gate_results": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "x-skeleton-ordering": "compression_gate_canonical_order",
+          "x-skeleton-unique-fields": [["gate"]],
+          "items": {"$ref": "#/$defs/gateResult"}
+        },
+        "exemptions": {
+          "type": "array",
+          "uniqueItems": true,
+          "x-skeleton-ordering": "capsule_id_lexicographic",
+          "x-skeleton-unique-fields": [["capsule_id"]],
+          "items": {"$ref": "#/$defs/exemptionOutcome"}
+        },
+        "completeness": {"enum": ["complete", "partial"]}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "allOf": [
+        {"$ref": "#/$defs/receiptCommon"},
+        {
+          "properties": {
+            "completeness": {"const": "complete"},
+            "gate_results": {"minItems": 5, "maxItems": 5}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/receiptCommon"},
+        {
+          "properties": {
+            "completeness": {"const": "partial"},
+            "gate_results": {"minItems": 1, "maxItems": 4}
+          }
+        }
+      ]
+    }
+  ]
+}

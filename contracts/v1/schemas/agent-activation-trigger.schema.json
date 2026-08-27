@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/agent-activation-trigger.schema.json",
+  "title": "Skeleton Agent Specialist Activation Trigger v1",
+  "description": "A deterministic integer threshold decision recorded before any subordinate specialist dispatch or incremental budget use.",
+  "$defs": {
+    "common": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "activation_trigger_id",
+        "invocation_id",
+        "resident_attempt",
+        "threshold_profile_id",
+        "threshold_profile_version",
+        "measurement_unit",
+        "comparison_semantics",
+        "complexity_ppm",
+        "complexity_threshold_ppm",
+        "uncertainty_ppm",
+        "uncertainty_threshold_ppm",
+        "contradiction_ppm",
+        "contradiction_threshold_ppm",
+        "consequence_ordinal",
+        "consequence_threshold_ordinal",
+        "activation_decision",
+        "specialist_role",
+        "resident_insufficiency_reason",
+        "incremental_budget_allocation_id",
+        "specialist_context_root",
+        "specialist_capability_root",
+        "recorded_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.agent-activation-trigger.v1"},
+        "record_type": {"const": "specialist_activation_trigger"},
+        "activation_trigger_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "resident_attempt": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "threshold_profile_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "threshold_profile_version": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/schemaVersion"},
+        "measurement_unit": {"const": "parts_per_million"},
+        "comparison_semantics": {"const": "activate_when_any_measurement_greater_than_or_equal_to_threshold"},
+        "complexity_ppm": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/ppm"},
+        "complexity_threshold_ppm": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/ppm"},
+        "uncertainty_ppm": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/ppm"},
+        "uncertainty_threshold_ppm": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/ppm"},
+        "contradiction_ppm": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/ppm"},
+        "contradiction_threshold_ppm": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/ppm"},
+        "consequence_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/consequenceOrdinal"},
+        "consequence_threshold_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/consequenceOrdinal"},
+        "activation_decision": {"enum": ["resident_sufficient", "specialist_required"]},
+        "specialist_role": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSpecialistRole"},
+        "resident_insufficiency_reason": {
+          "enum": [
+            "threshold_not_met",
+            "complexity_threshold_met",
+            "uncertainty_threshold_met",
+            "contradiction_threshold_met",
+            "consequence_threshold_met",
+            "multiple_thresholds_met"
+          ]
+        },
+        "incremental_budget_allocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "specialist_context_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "specialist_capability_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "recorded_at": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/utcTimestamp"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "allOf": [
+        {"$ref": "#/$defs/common"},
+        {
+          "properties": {
+            "activation_decision": {"const": "resident_sufficient"},
+            "specialist_role": {"const": "none"},
+            "resident_insufficiency_reason": {"const": "threshold_not_met"},
+            "incremental_budget_allocation_id": {"const": "none"},
+            "specialist_context_root": {"const": "none"},
+            "specialist_capability_root": {"const": "none"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/common"},
+        {
+          "properties": {
+            "activation_decision": {"const": "specialist_required"},
+            "specialist_role": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/specialistRole"},
+            "resident_insufficiency_reason": {
+              "enum": [
+                "complexity_threshold_met",
+                "uncertainty_threshold_met",
+                "contradiction_threshold_met",
+                "consequence_threshold_met",
+                "multiple_thresholds_met"
+              ]
+            },
+            "incremental_budget_allocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "specialist_context_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "specialist_capability_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+          }
+        }
+      ]
+    }
+  ]
+}

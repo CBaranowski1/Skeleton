@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/agent-result.schema.json",
+  "title": "Skeleton Agent Terminal Result v1",
+  "description": "One closed advisory-only terminal result with truthful empty, partial, or complete evidence and independent eligibility gates.",
+  "x-skeleton-authority-free": true,
+  "$defs": {
+    "boundedText": {"type": "string", "maxLength": 4096},
+    "terminalReason": {
+      "enum": [
+        "completed",
+        "insufficient_evidence",
+        "contradictory_evidence",
+        "budget_exhausted",
+        "model_timeout",
+        "model_unavailable",
+        "tool_unavailable",
+        "malformed_output",
+        "schema_invalid",
+        "receipt_invalid",
+        "unresolved_material_objection",
+        "independent_verification_missing",
+        "privacy_rejected",
+        "safety_incident",
+        "cancelled",
+        "stale_fence",
+        "abandoned",
+        "internal_error"
+      ]
+    },
+    "common": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "result_id",
+        "result_root",
+        "invocation_id",
+        "attempt",
+        "coordinator_generation",
+        "fence_id",
+        "organ",
+        "specialist_role",
+        "status",
+        "completeness",
+        "canonical_input_root",
+        "canonical_output_root",
+        "evidence_root",
+        "memory_root",
+        "tool_receipt_root",
+        "model_snapshot_root",
+        "budget_allocation_id",
+        "budget_consumption_root",
+        "objection_set_id",
+        "objection_root",
+        "objection_count",
+        "unresolved_material_objection_count",
+        "independent_disposition_count",
+        "independent_verification_root",
+        "conclusion",
+        "rationale",
+        "uncertainty_ppm",
+        "terminal_reason",
+        "eligibility",
+        "advisory_candidate_id",
+        "external_effect_count",
+        "recorded_at"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.agent-result.v1"},
+        "record_type": {"const": "terminal_result"},
+        "result_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "result_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "attempt": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "coordinator_generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "organ": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/organ"},
+        "specialist_role": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSpecialistRole"},
+        "status": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/resultStatus"},
+        "completeness": {"enum": ["empty", "partial", "complete"]},
+        "canonical_input_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "canonical_output_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "evidence_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "memory_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "tool_receipt_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "model_snapshot_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "budget_allocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "budget_consumption_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "objection_set_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "objection_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "objection_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "unresolved_material_objection_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "independent_disposition_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "independent_verification_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "conclusion": {"$ref": "#/$defs/boundedText"},
+        "rationale": {"$ref": "#/$defs/boundedText"},
+        "uncertainty_ppm": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/ppm"},
+        "terminal_reason": {"$ref": "#/$defs/terminalReason"},
+        "eligibility": {"enum": ["none", "shadow_evaluation_only", "advisory_membrane_only"]},
+        "advisory_candidate_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSha256"},
+        "external_effect_count": {"const": 0},
+        "recorded_at": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/utcTimestamp"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "allOf": [
+        {"$ref": "#/$defs/common"},
+        {
+          "properties": {
+            "status": {"enum": ["abstain", "need_more_data", "research_only", "invalid"]},
+            "eligibility": {"const": "none"},
+            "advisory_candidate_id": {"const": "none"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/common"},
+        {
+          "properties": {
+            "status": {"const": "shadow_eligible"},
+            "completeness": {"const": "complete"},
+            "unresolved_material_objection_count": {"const": 0},
+            "independent_disposition_count": {"minimum": 1},
+            "independent_verification_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "eligibility": {"const": "shadow_evaluation_only"},
+            "advisory_candidate_id": {"const": "none"},
+            "terminal_reason": {"const": "completed"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/common"},
+        {
+          "properties": {
+            "status": {"const": "proposal_eligible"},
+            "completeness": {"const": "complete"},
+            "unresolved_material_objection_count": {"const": 0},
+            "independent_disposition_count": {"minimum": 1},
+            "independent_verification_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "eligibility": {"const": "advisory_membrane_only"},
+            "advisory_candidate_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "terminal_reason": {"const": "completed"}
+          }
+        }
+      ]
+    }
+  ]
+}

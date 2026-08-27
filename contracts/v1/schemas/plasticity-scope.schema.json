@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/plasticity-scope.schema.json",
+  "title": "Skeleton Plasticity Scope Registry Entry v1",
+  "description": "One closed D-02 namespace-isolation registry row created only by owner-lineage configuration: kernel, identity, one lobe (coding, trading, or research initially), or one registered project; trading is representable only as one lobe, never a root abstraction, and every branch pins scope_kind to its closed scope_name set.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE13_SCOPE",
+  "$defs": {
+    "entryCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "schema_domain",
+        "scope_id",
+        "scope_kind",
+        "scope_name",
+        "owner_configuration_id",
+        "registered_ordinal"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.plasticity-scope.v1"},
+        "record_type": {"const": "scope_registration"},
+        "schema_domain": {"const": "SKELETON_PHASE13_SCOPE"},
+        "scope_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "scope_kind": {"enum": ["kernel", "identity", "lobe", "project"]},
+        "scope_name": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"},
+        "owner_configuration_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "registered_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+      }
+    }
+  },
+  "allOf": [
+    {"$ref": "#/$defs/entryCommon"},
+    {
+      "oneOf": [
+        {
+          "x-skeleton-branch": "kernel_root",
+          "properties": {
+            "scope_kind": {"const": "kernel"},
+            "scope_name": {"const": "kernel"}
+          }
+        },
+        {
+          "x-skeleton-branch": "identity_root",
+          "properties": {
+            "scope_kind": {"const": "identity"},
+            "scope_name": {"const": "identity"}
+          }
+        },
+        {
+          "x-skeleton-branch": "installed_lobe",
+          "properties": {
+            "scope_kind": {"const": "lobe"},
+            "scope_name": {"enum": ["coding", "trading", "research"]}
+          }
+        },
+        {
+          "x-skeleton-branch": "registered_project",
+          "properties": {
+            "scope_kind": {"const": "project"},
+            "scope_name": {
+              "allOf": [
+                {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"},
+                {"not": {"enum": ["kernel", "identity", "coding", "trading", "research"]}}
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

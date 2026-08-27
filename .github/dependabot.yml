@@ -1,0 +1,72 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: deps(actions)
+
+  - package-ecosystem: pip
+    directory: /python
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:15'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+    groups:
+      python-dependencies:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: deps(python)
+
+  - package-ecosystem: npm
+    directory: /typescript
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:30'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+    groups:
+      typescript-dependencies:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: deps(typescript)
+
+  - package-ecosystem: cargo
+    directory: /rust/contracts
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:45'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+    groups:
+      rust-contract-dependencies:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: deps(rust-contracts)
+
+  - package-ecosystem: cargo
+    directory: /tools/foundation-bootstrap
+    schedule:
+      interval: weekly
+      day: monday
+      time: '10:00'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+    groups:
+      bootstrap-dependencies:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: deps(bootstrap)

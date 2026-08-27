@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/adapter-descriptor.schema.json",
+  "title": "Skeleton Market Adapter Descriptor v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "identity", "capabilities"],
+  "properties": {
+    "schema_version": {"const": "skeleton.adapter-descriptor.v1"},
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "venue", "jurisdiction", "environment", "version"],
+      "properties": {
+        "family": {"const": "listed_cash_equity"},
+        "venue": {"const": "xnys"},
+        "jurisdiction": {"const": "US"},
+        "environment": {"enum": ["fixture", "paper", "simulation"]},
+        "version": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"}
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 10,
+      "required": ["discovery", "normalization", "calendar_session", "lifecycle", "correction", "cost", "fill", "failure", "settlement", "capability"],
+      "properties": {
+        "discovery": {"$ref": "#/$defs/disposition"},
+        "normalization": {"$ref": "#/$defs/disposition"},
+        "calendar_session": {"$ref": "#/$defs/disposition"},
+        "lifecycle": {"$ref": "#/$defs/disposition"},
+        "correction": {"$ref": "#/$defs/disposition"},
+        "cost": {"$ref": "#/$defs/disposition"},
+        "fill": {"$ref": "#/$defs/disposition"},
+        "failure": {"$ref": "#/$defs/disposition"},
+        "settlement": {"$ref": "#/$defs/disposition"},
+        "capability": {"$ref": "#/$defs/disposition"}
+      }
+    }
+  },
+  "$defs": {
+    "disposition": {
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["state", "implementation_id"], "properties": {"state": {"const": "supported"}, "implementation_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"}}},
+        {"type": "object", "additionalProperties": false, "required": ["state", "reason"], "properties": {"state": {"const": "unsupported"}, "reason": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"}}}
+      ]
+    }
+  }
+}

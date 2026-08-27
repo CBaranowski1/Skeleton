@@ -1,0 +1,13 @@
+{"expected_verdict":"accept","exposure_kind":"shares","id":"exposure-shares","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"accept","exposure_kind":"contract_multiplier","id":"exposure-contract-multiplier","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"accept","exposure_kind":"notional","id":"exposure-notional","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"accept","exposure_kind":"stake","id":"exposure-stake","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"accept","exposure_kind":"collateral","id":"exposure-collateral","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"accept","exposure_kind":"payout","id":"exposure-payout","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"accept","exposure_kind":"token_units","id":"exposure-token-units","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"accept","exposure_kind":"probability","id":"exposure-probability","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"accept","exposure_kind":"gross","id":"exposure-gross","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"accept","exposure_kind":"net","id":"exposure-net","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"accept","exposure_kind":"currency_basis","id":"exposure-currency-basis","schema_id":"https://schemas.skeleton.local/v1/market-exposure.schema.json"}
+{"expected_verdict":"accept","id":"conversion-eur-usd","schema_id":"https://schemas.skeleton.local/v1/market-conversion.schema.json"}
+{"expected_verdict":"accept","id":"cross-family-join-accepted","schema_id":"https://schemas.skeleton.local/v1/market-join-decision.schema.json"}

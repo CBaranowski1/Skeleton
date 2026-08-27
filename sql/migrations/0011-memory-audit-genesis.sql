@@ -1,0 +1,8 @@
+CREATE TRIGGER memory_audit_chain_genesis_insert_guard
+BEFORE INSERT ON memory_audit_chain
+WHEN NEW.sequence < 1
+  OR (NEW.sequence = 1 AND NEW.previous_audit_id != '0000000000000000000000000000000000000000000000000000000000000000')
+  OR (NEW.sequence > 1 AND NEW.previous_audit_id = '0000000000000000000000000000000000000000000000000000000000000000')
+BEGIN
+    SELECT RAISE(ABORT,'audit_genesis_invalid');
+END;

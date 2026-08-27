@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/plasticity-homeostasis.schema.json",
+  "title": "Skeleton Plasticity Homeostasis Event v1",
+  "description": "One append-only integer-exact D-15/D-16 homeostasis accounting event over the closed nine budget kinds, per scope or globally: per-mille utilization selecting a deterministic pressure band, the closed five-action ladder, nonnegative exact measurement fields so clamped outcomes can never grant a negative allowance, and structurally marked pressure-exempt receipt, rollback, audit, and placeholder appends that are never clamped; at the hard ceiling new admission fails closed to homeostasis_clamped with zero committed amount, and no float or wall-clock member is representable.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE13_HOMEOSTASIS",
+  "x-skeleton-cross-field": [
+    "amount_after MUST equal amount_before + committed_amount exactly",
+    "homeostasis may pause, quarantine, or reverse — never promote (PLT-07)"
+  ],
+  "$defs": {
+    "globalOrScopeId": {
+      "oneOf": [
+        {"const": "global"},
+        {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+      ]
+    },
+    "budgetKind": {
+      "enum": [
+        "rank",
+        "drift",
+        "kl_divergence",
+        "regression_loss",
+        "storage_bytes",
+        "training_compute",
+        "delta_magnitude",
+        "delta_count",
+        "application_frequency"
+      ]
+    },
+    "pressureBand": {
+      "enum": ["nominal", "elevated", "high", "ceiling"]
+    },
+    "perMille": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "eventCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "schema_domain",
+        "event_id",
+        "scope_id",
+        "budget_kind",
+        "append_class",
+        "pressure_exempt",
+        "homeostasis_profile_id",
+        "measurement",
+        "cap_amount",
+        "amount_before",
+        "attempted_amount",
+        "committed_amount",
+        "amount_after",
+        "utilization_permille",
+        "band",
+        "action",
+        "window_ordinal",
+        "fence_id",
+        "generation",
+        "attempt_ordinal"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.plasticity-homeostasis.v1"},
+        "record_type": {"const": "homeostasis_event"},
+        "schema_domain": {"const": "SKELETON_PHASE13_HOMEOSTASIS"},
+        "event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "scope_id": {"$ref": "#/$defs/globalOrScopeId"},
+        "budget_kind": {"$ref": "#/$defs/budgetKind"},
+        "append_class": {
+          "enum": [
+            "delta_admission",
+            "receipt_append",
+            "rollback_append",
+            "audit_append",
+            "placeholder_append"
+          ]
+        },
+        "pressure_exempt": {"type": "boolean"},
+        "homeostasis_profile_id": {"const": "skeleton.plasticity-homeostasis-profile.v1"},
+        "measurement": {"const": "fixed_point_integer_exact"},
+        "cap_amount": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "amount_before": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "attempted_amount": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "committed_amount": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "amount_after": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "utilization_permille": {"$ref": "#/$defs/perMille"},
+        "band": {"$ref": "#/$defs/pressureBand"},
+        "action": {
+          "enum": [
+            "admit",
+            "clamp_magnitude",
+            "defer_admission",
+            "quarantine_pressure",
+            "homeostasis_clamped"
+          ]
+        },
+        "window_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "x-skeleton-branch": "pressure_exempt_append",
+          "properties": {
+            "append_class": {
+              "enum": ["receipt_append", "rollback_append", "audit_append", "placeholder_append"]
+            },
+            "pressure_exempt": {"const": true},
+            "action": {"const": "admit"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "x-skeleton-branch": "admission_admit",
+          "properties": {
+            "append_class": {"const": "delta_admission"},
+            "pressure_exempt": {"const": false},
+            "action": {"const": "admit"},
+            "band": {"enum": ["nominal", "elevated"]}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "x-skeleton-branch": "admission_clamp_magnitude",
+          "properties": {
+            "append_class": {"const": "delta_admission"},
+            "pressure_exempt": {"const": false},
+            "action": {"const": "clamp_magnitude"},
+            "band": {"enum": ["elevated", "high"]}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "x-skeleton-branch": "admission_defer",
+          "properties": {
+            "append_class": {"const": "delta_admission"},
+            "pressure_exempt": {"const": false},
+            "action": {"const": "defer_admission"},
+            "band": {"const": "high"},
+            "committed_amount": {"const": 0}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "x-skeleton-branch": "admission_quarantine_pressure",
+          "properties": {
+            "append_class": {"const": "delta_admission"},
+            "pressure_exempt": {"const": false},
+            "action": {"const": "quarantine_pressure"},
+            "band": {"enum": ["high", "ceiling"]},
+            "committed_amount": {"const": 0}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/eventCommon"},
+        {
+          "x-skeleton-branch": "admission_homeostasis_clamped",
+          "properties": {
+            "append_class": {"const": "delta_admission"},
+            "pressure_exempt": {"const": false},
+            "action": {"const": "homeostasis_clamped"},
+            "band": {"const": "ceiling"},
+            "committed_amount": {"const": 0}
+          }
+        }
+      ]
+    }
+  ]
+}

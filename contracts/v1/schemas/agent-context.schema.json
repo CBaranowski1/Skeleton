@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/agent-context.schema.json",
+  "title": "Skeleton Sealed Agent Context v1",
+  "description": "A detached context with one immutable system contract and separately typed provenance-bearing untrusted data segments.",
+  "$defs": {
+    "systemContractSegment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "segment_type",
+        "system_contract_id",
+        "content_root",
+        "canonical_byte_count",
+        "classification",
+        "retention"
+      ],
+      "properties": {
+        "segment_type": {"const": "system_contract"},
+        "system_contract_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "content_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "canonical_byte_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "classification": {"const": "internal"},
+        "retention": {"const": "retain_audit_metadata"}
+      }
+    },
+    "untrustedSegment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "segment_type",
+        "segment_id",
+        "source_id",
+        "provenance",
+        "taints",
+        "purpose",
+        "classification",
+        "retention",
+        "instruction_disposition",
+        "canonical_byte_count",
+        "content_root"
+      ],
+      "properties": {
+        "segment_type": {
+          "enum": ["user_input", "evidence", "memory", "candidate", "tool_result"]
+        },
+        "segment_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "source_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "provenance": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/provenanceClass"},
+        "taints": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/taintInventory"},
+        "purpose": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/identifier"},
+        "classification": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/dataClassification"},
+        "retention": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/retentionDisposition"},
+        "instruction_disposition": {"const": "data_only"},
+        "canonical_byte_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "content_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "x-skeleton-sorted-inventories": ["segments.segment_id"],
+  "x-skeleton-exact-counters": [["segment_count", "segments"]],
+  "x-skeleton-whole-record-segments": true,
+  "required": [
+    "schema_version",
+    "record_type",
+    "sealed_context_id",
+    "invocation_id",
+    "agent_identity_event_id",
+    "organ",
+    "specialist_role",
+    "context_construction_version",
+    "system_contract",
+    "tool_allowlist_root",
+    "phase10_retrieval_result_id",
+    "phase10_retrieval_result_root",
+    "evidence_root",
+    "memory_root",
+    "segments",
+    "segment_count",
+    "segment_byte_count",
+    "segment_inventory_root",
+    "minimization_decision_root",
+    "taint_ledger_root"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.agent-context.v1"},
+    "record_type": {"const": "sealed_agent_context"},
+    "sealed_context_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "agent_identity_event_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "organ": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/organ"},
+    "specialist_role": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSpecialistRole"},
+    "context_construction_version": {"const": "skeleton.agent-context.v1"},
+    "system_contract": {"$ref": "#/$defs/systemContractSegment"},
+    "tool_allowlist_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "phase10_retrieval_result_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "phase10_retrieval_result_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "evidence_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "memory_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "segments": {
+      "type": "array",
+      "uniqueItems": true,
+      "x-skeleton-ordering": "segment_id_lexicographic",
+      "items": {"$ref": "#/$defs/untrustedSegment"}
+    },
+    "segment_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "segment_byte_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "segment_inventory_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "minimization_decision_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "taint_ledger_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+  }
+}

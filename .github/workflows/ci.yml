@@ -1,0 +1,119 @@
+name: Portable CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hygiene:
+    name: Repository hygiene
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          # HEAD must have a parent. In a depth-1 clone Git treats HEAD as a
+          # root commit, so `git show --check` scans every historical file.
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Check patch whitespace
+        shell: pwsh
+        run: git show --check --format=fuller --no-renames HEAD
+
+  python-contracts:
+    name: Python crypto and schema contracts
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
+        with:
+          python-version: 3.14.6
+          cache: pip
+          cache-dependency-path: python/requirements-current.lock
+      - name: Install hash-locked dependencies
+        shell: pwsh
+        run: 'python -m pip install --require-hashes --only-binary=:all: -r python/requirements-current.lock'
+      - name: Compile kernel sources
+        shell: pwsh
+        run: python -m compileall -q python/src
+      - name: Test public-readiness secret patterns
+        shell: pwsh
+        run: python .github/scripts/test_public_readiness.py
+      - name: Test fail-closed public export
+        shell: pwsh
+        run: python -m unittest tools/public-export/test_export_public.py
+      - name: Verify committed public export manifest
+        if: github.event.repository.private
+        shell: pwsh
+        run: |
+          $candidate = Join-Path $env:RUNNER_TEMP 'skeleton-public-candidate'
+          python tools/public-export/export_public.py --repo . --source HEAD --output $candidate
+      - name: Test protocol schemas
+        shell: pwsh
+        run: python -m pytest -q python/tests/contracts/test_protocol_schemas.py
+      - name: Test portable proposal boundaries
+        shell: pwsh
+        run: python -m pytest -q python/tests/public/test_public_proposal_boundaries.py
+
+  typescript:
+    name: TypeScript strict type-check
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: typescript
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+        with:
+          node-version: 26.4.0
+          cache: npm
+          cache-dependency-path: typescript/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Type-check
+        shell: pwsh
+        run: '& node_modules/@typescript/typescript-win32-x64/lib/tsc.exe --noEmit'
+
+  rust:
+    name: Rust contract and bootstrap tests
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        shell: pwsh
+        run: |
+          rustup toolchain install 1.97.1-x86_64-pc-windows-msvc --profile minimal --no-self-update
+          rustup default 1.97.1-x86_64-pc-windows-msvc
+      - name: Test independent contract verifier
+        shell: pwsh
+        run: cargo test --manifest-path rust/contracts/Cargo.toml --locked --lib -- --skip indexed_golden_jcs_signature_and_trust_corpus_matches
+      - name: Test native foundation bootstrap
+        shell: pwsh
+        run: cargo test --manifest-path tools/foundation-bootstrap/Cargo.toml --locked

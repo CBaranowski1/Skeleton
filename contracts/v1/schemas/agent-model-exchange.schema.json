@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/agent-model-exchange.schema.json",
+  "title": "Skeleton Provider-Neutral Agent Model Exchange v1",
+  "description": "Exact provider descriptor, request, response, and usage receipts with honest snapshot pinning and no ambient alias or fallback branch.",
+  "$defs": {
+    "snapshotBinding": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pinning_disposition", "snapshot_id", "pinning_reason"],
+          "properties": {
+            "pinning_disposition": {"const": "exact_snapshot"},
+            "snapshot_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+            "pinning_reason": {"const": "provider_supports_exact_snapshot"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pinning_disposition", "snapshot_id", "pinning_reason"],
+          "properties": {
+            "pinning_disposition": {"const": "unsupported_snapshot_pinning"},
+            "snapshot_id": {"const": "none"},
+            "pinning_reason": {"const": "provider_does_not_support_exact_snapshot"}
+          }
+        }
+      ]
+    },
+    "explicitParameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "temperature_ppm",
+        "top_p_ppm",
+        "max_input_tokens",
+        "max_output_tokens",
+        "random_seed"
+      ],
+      "properties": {
+        "temperature_ppm": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/ppm"},
+        "top_p_ppm": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/ppm"},
+        "max_input_tokens": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "max_output_tokens": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "random_seed": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "provider_descriptor_id",
+        "provider_id",
+        "adapter_artifact_root",
+        "snapshot_binding",
+        "capability_profile_id",
+        "context_construction_version",
+        "parameter_profile_root",
+        "usage_semantics_root",
+        "regression_verdict",
+        "regression_evidence_root",
+        "egress_class"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.agent-model-exchange.v1"},
+        "record_type": {"const": "provider_descriptor"},
+        "provider_descriptor_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "provider_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "adapter_artifact_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "snapshot_binding": {"$ref": "#/$defs/snapshotBinding"},
+        "capability_profile_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "context_construction_version": {"const": "skeleton.agent-context.v1"},
+        "parameter_profile_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "usage_semantics_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "regression_verdict": {"enum": ["passed", "failed"]},
+        "regression_evidence_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "egress_class": {"const": "none"}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "model_request_id",
+        "invocation_id",
+        "attempt",
+        "organ",
+        "specialist_role",
+        "provider_descriptor_id",
+        "provider_id",
+        "snapshot_binding",
+        "capability_profile_id",
+        "sealed_context_id",
+        "sealed_context_root",
+        "context_construction_version",
+        "output_schema_root",
+        "explicit_parameters",
+        "regression_verdict",
+        "budget_allocation_id"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.agent-model-exchange.v1"},
+        "record_type": {"const": "model_request"},
+        "model_request_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "attempt": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "organ": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/organ"},
+        "specialist_role": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/noneOrSpecialistRole"},
+        "provider_descriptor_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "provider_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "snapshot_binding": {"$ref": "#/$defs/snapshotBinding"},
+        "capability_profile_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "sealed_context_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "sealed_context_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "context_construction_version": {"const": "skeleton.agent-context.v1"},
+        "output_schema_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "explicit_parameters": {"$ref": "#/$defs/explicitParameters"},
+        "regression_verdict": {"const": "passed"},
+        "budget_allocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "model_response_receipt_id",
+        "model_request_id",
+        "invocation_id",
+        "attempt",
+        "provider_descriptor_id",
+        "provider_id",
+        "snapshot_binding",
+        "capability_profile_id",
+        "sealed_context_id",
+        "context_construction_version",
+        "regression_verdict",
+        "raw_response_sha256",
+        "raw_response_byte_count",
+        "usage_receipt_id",
+        "finish_disposition"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.agent-model-exchange.v1"},
+        "record_type": {"const": "model_response_receipt"},
+        "model_response_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "model_request_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "attempt": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "provider_descriptor_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "provider_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "snapshot_binding": {"$ref": "#/$defs/snapshotBinding"},
+        "capability_profile_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "sealed_context_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "context_construction_version": {"const": "skeleton.agent-context.v1"},
+        "regression_verdict": {"const": "passed"},
+        "raw_response_sha256": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "raw_response_byte_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "usage_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "finish_disposition": {"enum": ["complete", "length_limited", "refused", "transport_error", "timeout", "invalid"]}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "usage_receipt_id",
+        "model_request_id",
+        "model_response_receipt_id",
+        "provider_descriptor_id",
+        "provider_id",
+        "attempt",
+        "input_tokens",
+        "output_tokens",
+        "elapsed_milliseconds",
+        "accelerator_milliseconds",
+        "usage_semantics_root"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.agent-model-exchange.v1"},
+        "record_type": {"const": "model_usage_receipt"},
+        "usage_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "model_request_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "model_response_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "provider_descriptor_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "provider_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "attempt": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "input_tokens": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "output_tokens": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "elapsed_milliseconds": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "accelerator_milliseconds": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "usage_semantics_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+      }
+    }
+  ]
+}

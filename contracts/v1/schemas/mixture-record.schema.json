@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/mixture-record.schema.json",
+  "title": "Skeleton Per-Inference Mixture Record v1",
+  "description": "The exhaustive PLT-01 effective-model composition for exactly one inference: the immutable genome snapshot identity plus the sorted unique (scope, artifact_id, version_ordinal) active-layer triples across identity, domain, project, and fast-weight adapters; an inference without a mixture record is a typed integrity failure, and a partial, duplicated, or genome-less composition is unrepresentable.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE13_MIXTURE",
+  "x-skeleton-sorted-inventories": ["active_layers"],
+  "x-skeleton-cross-field": [
+    "active_layers MUST be sorted by (scope canonical order, artifact_id lexicographic) with uniqueness over (scope, artifact_id)",
+    "exactly one mixture record exists per invocation_id, appended in the same writer transaction that seals the invocation receipt (D-03)"
+  ],
+  "$defs": {
+    "activeLayer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "artifact_id", "version_ordinal"],
+      "properties": {
+        "scope": {"$ref": "https://schemas.skeleton.local/v1/experience-gradient.schema.json#/$defs/scopeBinding"},
+        "artifact_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "version_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "schema_domain",
+    "mixture_id",
+    "invocation_id",
+    "genome_snapshot_id",
+    "active_layers",
+    "fence_id",
+    "generation",
+    "attempt_ordinal"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.mixture-record.v1"},
+    "record_type": {"const": "mixture_record"},
+    "schema_domain": {"const": "SKELETON_PHASE13_MIXTURE"},
+    "mixture_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "invocation_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "genome_snapshot_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "active_layers": {
+      "type": "array",
+      "maxItems": 256,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "scope_canonical_then_artifact_id_lexicographic",
+      "x-skeleton-unique-fields": [["scope", "artifact_id"]],
+      "items": {"$ref": "#/$defs/activeLayer"}
+    },
+    "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"}
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/kernel-status-v2.schema.json",
+  "title": "Skeleton Additive Read-Only Kernel Status v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kernel_status_v1_sha256", "evidence_health", "observed_at"],
+  "properties": {
+    "schema_version": {"const": "skeleton.kernel-status.v2"},
+    "kernel_status_v1_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "evidence_health": {"$ref": "#/$defs/healthSnapshot"},
+    "observed_at": {"$ref": "#/$defs/timestamp"}
+  },
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?Z$"
+    },
+    "signalStateValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "value", "reason_code"],
+      "properties": {
+        "state": {"enum": ["ready", "degraded", "unknown", "stale", "unavailable"]},
+        "value": {},
+        "reason_code": {}
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "state": {"const": "ready"},
+            "value": {"type": "integer"},
+            "reason_code": {"type": "null"}
+          }
+        },
+        {
+          "properties": {
+            "state": {"const": "degraded"},
+            "value": {"type": "integer"},
+            "reason_code": {"const": "threshold_exceeded"}
+          }
+        },
+        {
+          "properties": {
+            "state": {"const": "unknown"},
+            "value": {"type": "null"},
+            "reason_code": {"const": "evidence_missing"}
+          }
+        },
+        {
+          "properties": {
+            "state": {"const": "stale"},
+            "value": {"type": "null"},
+            "reason_code": {"const": "evidence_stale"}
+          }
+        },
+        {
+          "properties": {
+            "state": {"const": "unavailable"},
+            "value": {"type": "null"},
+            "reason_code": {"enum": ["evidence_corrupt", "evidence_partial"]}
+          }
+        }
+      ]
+    },
+    "countSignal": {
+      "allOf": [
+        {"$ref": "#/$defs/signalStateValue"},
+        {
+          "properties": {
+            "value": {
+              "oneOf": [
+                {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+                {"type": "null"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "durationSignal": {
+      "allOf": [
+        {"$ref": "#/$defs/signalStateValue"},
+        {
+          "properties": {
+            "value": {
+              "oneOf": [
+                {"type": "integer", "minimum": 0, "maximum": 31536000},
+                {"type": "null"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "ratioSignal": {
+      "allOf": [
+        {"$ref": "#/$defs/signalStateValue"},
+        {
+          "properties": {
+            "value": {
+              "oneOf": [
+                {"type": "integer", "minimum": 0, "maximum": 1000000},
+                {"type": "null"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "signals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ingest_lag", "correction_rate", "sequence_gaps", "unresolved_identities", "exclusions", "rights_expiry", "deletion_backlog", "reproducibility_failures", "storage_pressure"],
+      "properties": {
+        "ingest_lag": {"$ref": "#/$defs/durationSignal"},
+        "correction_rate": {"$ref": "#/$defs/ratioSignal"},
+        "sequence_gaps": {"$ref": "#/$defs/countSignal"},
+        "unresolved_identities": {"$ref": "#/$defs/countSignal"},
+        "exclusions": {"$ref": "#/$defs/countSignal"},
+        "rights_expiry": {"$ref": "#/$defs/durationSignal"},
+        "deletion_backlog": {"$ref": "#/$defs/countSignal"},
+        "reproducibility_failures": {"$ref": "#/$defs/countSignal"},
+        "storage_pressure": {"$ref": "#/$defs/ratioSignal"}
+      }
+    },
+    "healthSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshot_sha256", "source_state_sha256", "readiness", "observed_at", "signals"],
+      "properties": {
+        "snapshot_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "source_state_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "readiness": {"enum": ["ready", "degraded", "unknown", "unavailable"]},
+        "observed_at": {"$ref": "#/$defs/timestamp"},
+        "signals": {"$ref": "#/$defs/signals"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"readiness": {"const": "ready"}}, "required": ["readiness"]},
+          "then": {"properties": {"signals": {"$ref": "#/$defs/allSignalsReady"}}}
+        },
+        {
+          "if": {"properties": {"readiness": {"const": "degraded"}}, "required": ["readiness"]},
+          "then": {"properties": {"signals": {"allOf": [{"$ref": "#/$defs/allSignalsNonBlocking"}, {"$ref": "#/$defs/atLeastOneDegradedSignal"}]}}}
+        },
+        {
+          "if": {"properties": {"readiness": {"const": "unknown"}}, "required": ["readiness"]},
+          "then": {"properties": {"signals": {"allOf": [{"$ref": "#/$defs/allSignalsKnownOrUnknown"}, {"$ref": "#/$defs/atLeastOneUnknownSignal"}]}}}
+        },
+        {
+          "if": {"properties": {"readiness": {"const": "unavailable"}}, "required": ["readiness"]},
+          "then": {"properties": {"signals": {"$ref": "#/$defs/atLeastOneUnavailableSignal"}}}
+        }
+      ]
+    },
+    "allSignalsReady": {
+      "properties": {
+        "ingest_lag": {"properties": {"state": {"const": "ready"}}},
+        "correction_rate": {"properties": {"state": {"const": "ready"}}},
+        "sequence_gaps": {"properties": {"state": {"const": "ready"}}},
+        "unresolved_identities": {"properties": {"state": {"const": "ready"}}},
+        "exclusions": {"properties": {"state": {"const": "ready"}}},
+        "rights_expiry": {"properties": {"state": {"const": "ready"}}},
+        "deletion_backlog": {"properties": {"state": {"const": "ready"}}},
+        "reproducibility_failures": {"properties": {"state": {"const": "ready"}}},
+        "storage_pressure": {"properties": {"state": {"const": "ready"}}}
+      }
+    },
+    "allSignalsNonBlocking": {
+      "properties": {
+        "ingest_lag": {"properties": {"state": {"enum": ["ready", "degraded", "stale", "unknown"]}}},
+        "correction_rate": {"properties": {"state": {"enum": ["ready", "degraded", "stale", "unknown"]}}},
+        "sequence_gaps": {"properties": {"state": {"enum": ["ready", "degraded", "stale", "unknown"]}}},
+        "unresolved_identities": {"properties": {"state": {"enum": ["ready", "degraded", "stale", "unknown"]}}},
+        "exclusions": {"properties": {"state": {"enum": ["ready", "degraded", "stale", "unknown"]}}},
+        "rights_expiry": {"properties": {"state": {"enum": ["ready", "degraded", "stale", "unknown"]}}},
+        "deletion_backlog": {"properties": {"state": {"enum": ["ready", "degraded", "stale", "unknown"]}}},
+        "reproducibility_failures": {"properties": {"state": {"enum": ["ready", "degraded", "stale", "unknown"]}}},
+        "storage_pressure": {"properties": {"state": {"enum": ["ready", "degraded", "stale", "unknown"]}}}
+      }
+    },
+    "allSignalsKnownOrUnknown": {
+      "properties": {
+        "ingest_lag": {"properties": {"state": {"enum": ["ready", "unknown"]}}},
+        "correction_rate": {"properties": {"state": {"enum": ["ready", "unknown"]}}},
+        "sequence_gaps": {"properties": {"state": {"enum": ["ready", "unknown"]}}},
+        "unresolved_identities": {"properties": {"state": {"enum": ["ready", "unknown"]}}},
+        "exclusions": {"properties": {"state": {"enum": ["ready", "unknown"]}}},
+        "rights_expiry": {"properties": {"state": {"enum": ["ready", "unknown"]}}},
+        "deletion_backlog": {"properties": {"state": {"enum": ["ready", "unknown"]}}},
+        "reproducibility_failures": {"properties": {"state": {"enum": ["ready", "unknown"]}}},
+        "storage_pressure": {"properties": {"state": {"enum": ["ready", "unknown"]}}}
+      }
+    },
+    "atLeastOneDegradedSignal": {
+      "anyOf": [
+        {"properties": {"ingest_lag": {"properties": {"state": {"enum": ["degraded", "stale"]}}}}},
+        {"properties": {"correction_rate": {"properties": {"state": {"enum": ["degraded", "stale"]}}}}},
+        {"properties": {"sequence_gaps": {"properties": {"state": {"enum": ["degraded", "stale"]}}}}},
+        {"properties": {"unresolved_identities": {"properties": {"state": {"enum": ["degraded", "stale"]}}}}},
+        {"properties": {"exclusions": {"properties": {"state": {"enum": ["degraded", "stale"]}}}}},
+        {"properties": {"rights_expiry": {"properties": {"state": {"enum": ["degraded", "stale"]}}}}},
+        {"properties": {"deletion_backlog": {"properties": {"state": {"enum": ["degraded", "stale"]}}}}},
+        {"properties": {"reproducibility_failures": {"properties": {"state": {"enum": ["degraded", "stale"]}}}}},
+        {"properties": {"storage_pressure": {"properties": {"state": {"enum": ["degraded", "stale"]}}}}}
+      ]
+    },
+    "atLeastOneUnknownSignal": {
+      "anyOf": [
+        {"properties": {"ingest_lag": {"properties": {"state": {"const": "unknown"}}}}},
+        {"properties": {"correction_rate": {"properties": {"state": {"const": "unknown"}}}}},
+        {"properties": {"sequence_gaps": {"properties": {"state": {"const": "unknown"}}}}},
+        {"properties": {"unresolved_identities": {"properties": {"state": {"const": "unknown"}}}}},
+        {"properties": {"exclusions": {"properties": {"state": {"const": "unknown"}}}}},
+        {"properties": {"rights_expiry": {"properties": {"state": {"const": "unknown"}}}}},
+        {"properties": {"deletion_backlog": {"properties": {"state": {"const": "unknown"}}}}},
+        {"properties": {"reproducibility_failures": {"properties": {"state": {"const": "unknown"}}}}},
+        {"properties": {"storage_pressure": {"properties": {"state": {"const": "unknown"}}}}}
+      ]
+    },
+    "atLeastOneUnavailableSignal": {
+      "anyOf": [
+        {"properties": {"ingest_lag": {"properties": {"state": {"const": "unavailable"}}}}},
+        {"properties": {"correction_rate": {"properties": {"state": {"const": "unavailable"}}}}},
+        {"properties": {"sequence_gaps": {"properties": {"state": {"const": "unavailable"}}}}},
+        {"properties": {"unresolved_identities": {"properties": {"state": {"const": "unavailable"}}}}},
+        {"properties": {"exclusions": {"properties": {"state": {"const": "unavailable"}}}}},
+        {"properties": {"rights_expiry": {"properties": {"state": {"const": "unavailable"}}}}},
+        {"properties": {"deletion_backlog": {"properties": {"state": {"const": "unavailable"}}}}},
+        {"properties": {"reproducibility_failures": {"properties": {"state": {"const": "unavailable"}}}}},
+        {"properties": {"storage_pressure": {"properties": {"state": {"const": "unavailable"}}}}}
+      ]
+    }
+  }
+}

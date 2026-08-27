@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/constitution.schema.json",
+  "title": "Skeleton Constitution Envelope v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "signature_protocol_version",
+    "object_class",
+    "signature_domain",
+    "signer_key_id",
+    "signer_set_epoch",
+    "body",
+    "signature"
+  ],
+  "properties": {
+    "signature_protocol_version": {
+      "const": 1
+    },
+    "object_class": {
+      "const": "constitution"
+    },
+    "signature_domain": {
+      "const": "skeleton.constitution.v1"
+    },
+    "signer_key_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/ed25519KeyId"
+    },
+    "signer_set_epoch": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/canonicalUint64"
+    },
+    "body": {
+      "$ref": "#/$defs/constitutionBody"
+    },
+    "signature": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/ed25519Signature"
+    }
+  },
+  "$defs": {
+    "constitutionBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "constitution_id",
+        "constitution_epoch",
+        "previous_constitution_sha256",
+        "previous_signer_set_epoch",
+        "transition_id",
+        "release_root_fingerprint_sha256",
+        "product_boundary",
+        "capabilities",
+        "prohibitions",
+        "sports_execution_policy",
+        "authority_policy",
+        "next_signer_set"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "skeleton.constitution.body.v1"
+        },
+        "constitution_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "constitution_epoch": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/canonicalUint64"
+        },
+        "previous_constitution_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "previous_signer_set_epoch": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/canonicalUint64"
+        },
+        "transition_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"
+        },
+        "release_root_fingerprint_sha256": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+        },
+        "product_boundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "operator_scope",
+            "kernel_identity",
+            "external_customers_allowed",
+            "third_party_accounts_allowed"
+          ],
+          "properties": {
+            "operator_scope": {
+              "const": "single_owner_private"
+            },
+            "kernel_identity": {
+              "const": "domain_neutral_cognition_kernel"
+            },
+            "external_customers_allowed": {
+              "const": false
+            },
+            "third_party_accounts_allowed": {
+              "const": false
+            }
+          }
+        },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "allowed"
+          ],
+          "properties": {
+            "allowed": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"
+              }
+            }
+          }
+        },
+        "prohibitions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "accept_customer_funds",
+            "manage_third_party_accounts",
+            "publish_paid_advice_or_signals",
+            "copy_external_actions",
+            "hold_custody",
+            "transfer_third_party_value"
+          ],
+          "properties": {
+            "accept_customer_funds": {
+              "const": false
+            },
+            "manage_third_party_accounts": {
+              "const": false
+            },
+            "publish_paid_advice_or_signals": {
+              "const": false
+            },
+            "copy_external_actions": {
+              "const": false
+            },
+            "hold_custody": {
+              "const": false
+            },
+            "transfer_third_party_value": {
+              "const": false
+            }
+          }
+        },
+        "sports_execution_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "written_venue_permission_required",
+            "dated_counsel_approval_required"
+          ],
+          "properties": {
+            "enabled": {
+              "const": false
+            },
+            "written_venue_permission_required": {
+              "const": true
+            },
+            "dated_counsel_approval_required": {
+              "const": true
+            }
+          }
+        },
+        "authority_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "constitution_learnable",
+            "signer_set_mutation"
+          ],
+          "properties": {
+            "constitution_learnable": {
+              "const": false
+            },
+            "signer_set_mutation": {
+              "const": "pinned_root_signed_transition_only"
+            }
+          }
+        },
+        "next_signer_set": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "epoch",
+            "members"
+          ],
+          "properties": {
+            "epoch": {
+              "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/canonicalUint64"
+            },
+            "members": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/signerMember"
+              }
+            }
+          }
+        }
+      }
+    },
+    "signerMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key_id",
+        "public_key",
+        "status"
+      ],
+      "properties": {
+        "key_id": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/ed25519KeyId"
+        },
+        "public_key": {
+          "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/ed25519PublicKey"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "revoked"
+          ]
+        }
+      }
+    }
+  }
+}

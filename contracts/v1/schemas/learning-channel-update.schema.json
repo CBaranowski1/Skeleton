@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/learning-channel-update.schema.json",
+  "title": "Skeleton Learning Channel Update v1",
+  "description": "Exactly-one append-only channel-update row per evaluated pass, keyed by gradient identity over the closed five-channel enum: only the fast_weights payload may reference a delta identity, the four non-factual channel payloads carry versioned-table references and integer adjustments with no fact-assertion field, cross-channel payload mixtures are unrepresentable by branch pinning, and the grader organ is structurally unequal to the producer organ.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE13_CHANNEL_UPDATE",
+  "x-skeleton-cross-field": [
+    "a fast_weights channel update MUST reference a gradient whose outcome is success or failure and whose permitted_learning_targets contains fast_weights",
+    "exactly one channel-update row exists per evaluated pass of one gradient_id (store-level UNIQUE constraint)"
+  ],
+  "$defs": {
+    "fastWeightsPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["payload_kind", "delta_id"],
+      "properties": {
+        "payload_kind": {"const": "fast_weights"},
+        "delta_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+      }
+    },
+    "uncertaintyPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["payload_kind", "calibration_table_version_id", "widen_permille"],
+      "properties": {
+        "payload_kind": {"const": "uncertainty"},
+        "calibration_table_version_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "widen_permille": {"type": "integer", "minimum": 0, "maximum": 1000}
+      }
+    },
+    "retrievalPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["payload_kind", "retrieval_table_version_id", "reweight_permille"],
+      "properties": {
+        "payload_kind": {"const": "retrieval"},
+        "retrieval_table_version_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "reweight_permille": {"type": "integer", "minimum": 0, "maximum": 1000}
+      }
+    },
+    "routingPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["payload_kind", "routing_table_version_id", "route_ordinal"],
+      "properties": {
+        "payload_kind": {"const": "routing"},
+        "routing_table_version_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "route_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+      }
+    },
+    "experimentSelectionPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["payload_kind", "experiment_queue_version_id", "priority_ordinal"],
+      "properties": {
+        "payload_kind": {"const": "experiment_selection"},
+        "experiment_queue_version_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "priority_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+      }
+    },
+    "updateCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "schema_domain",
+        "channel_update_id",
+        "gradient_id",
+        "channel",
+        "payload",
+        "producer_organ",
+        "grader_organ",
+        "update_ordinal",
+        "fence_id",
+        "generation",
+        "attempt_ordinal"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.learning-channel-update.v1"},
+        "record_type": {"const": "channel_update"},
+        "schema_domain": {"const": "SKELETON_PHASE13_CHANNEL_UPDATE"},
+        "channel_update_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "gradient_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "channel": {"$ref": "https://schemas.skeleton.local/v1/experience-gradient.schema.json#/$defs/learningChannel"},
+        "payload": {
+          "oneOf": [
+            {"$ref": "#/$defs/fastWeightsPayload"},
+            {"$ref": "#/$defs/uncertaintyPayload"},
+            {"$ref": "#/$defs/retrievalPayload"},
+            {"$ref": "#/$defs/routingPayload"},
+            {"$ref": "#/$defs/experimentSelectionPayload"}
+          ]
+        },
+        "producer_organ": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/organ"},
+        "grader_organ": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/organ"},
+        "update_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"}
+      }
+    },
+    "selfGradingRejection": {
+      "x-skeleton-structural-inequality": "grader_organ MUST differ from producer_organ",
+      "not": {
+        "anyOf": [
+          {"properties": {"producer_organ": {"const": "recall"}, "grader_organ": {"const": "recall"}}},
+          {"properties": {"producer_organ": {"const": "planning"}, "grader_organ": {"const": "planning"}}},
+          {"properties": {"producer_organ": {"const": "simulation"}, "grader_organ": {"const": "simulation"}}},
+          {"properties": {"producer_organ": {"const": "falsification"}, "grader_organ": {"const": "falsification"}}},
+          {"properties": {"producer_organ": {"const": "execution_preparation"}, "grader_organ": {"const": "execution_preparation"}}},
+          {"properties": {"producer_organ": {"const": "outcome_judgment"}, "grader_organ": {"const": "outcome_judgment"}}},
+          {"properties": {"producer_organ": {"const": "learning_compilation"}, "grader_organ": {"const": "learning_compilation"}}},
+          {"properties": {"producer_organ": {"const": "sleep"}, "grader_organ": {"const": "sleep"}}}
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {"$ref": "#/$defs/updateCommon"},
+    {"$ref": "#/$defs/selfGradingRejection"},
+    {
+      "oneOf": [
+        {
+          "x-skeleton-branch": "fast_weights",
+          "properties": {
+            "channel": {"const": "fast_weights"},
+            "payload": {"$ref": "#/$defs/fastWeightsPayload"}
+          }
+        },
+        {
+          "x-skeleton-branch": "uncertainty",
+          "properties": {
+            "channel": {"const": "uncertainty"},
+            "payload": {"$ref": "#/$defs/uncertaintyPayload"}
+          }
+        },
+        {
+          "x-skeleton-branch": "retrieval",
+          "properties": {
+            "channel": {"const": "retrieval"},
+            "payload": {"$ref": "#/$defs/retrievalPayload"}
+          }
+        },
+        {
+          "x-skeleton-branch": "routing",
+          "properties": {
+            "channel": {"const": "routing"},
+            "payload": {"$ref": "#/$defs/routingPayload"}
+          }
+        },
+        {
+          "x-skeleton-branch": "experiment_selection",
+          "properties": {
+            "channel": {"const": "experiment_selection"},
+            "payload": {"$ref": "#/$defs/experimentSelectionPayload"}
+          }
+        }
+      ]
+    }
+  ]
+}

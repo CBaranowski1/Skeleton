@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/market-join-decision.schema.json",
+  "title": "Skeleton Market Join Decision v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "decision_id", "request_id", "accepted", "code", "left_value_id", "right_value_id", "decision_time", "derived_value", "derived_currency", "derived_unit"],
+  "properties": {
+    "schema_version": {"const": "skeleton.market-join-decision.v1"},
+    "decision_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "request_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "accepted": {"type": "boolean"},
+    "code": {"enum": ["accepted", "observation_future_available", "session_not_open", "observation_stale", "interval_not_closed", "horizon_mismatch", "conversion_invalid", "exposure_dimension_mismatch", "forward_fill_forbidden"]},
+    "left_value_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "right_value_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "decision_time": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"},
+    "derived_value": {"oneOf": [{"type": "null"}, {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/canonicalExactDecimal"}]},
+    "derived_currency": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[A-Z]{3}$"}]},
+    "derived_unit": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1, "maxLength": 32}]}
+  },
+  "allOf": [
+    {"if": {"properties": {"accepted": {"const": false}}}, "then": {"properties": {"derived_value": {"type": "null"}, "derived_currency": {"type": "null"}, "derived_unit": {"type": "null"}}}},
+    {"if": {"properties": {"accepted": {"const": true}}}, "then": {"properties": {"derived_value": {"type": "string"}, "derived_currency": {"type": "string"}, "derived_unit": {"type": "string"}}}}
+  ]
+}

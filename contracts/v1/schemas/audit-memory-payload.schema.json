@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/audit-memory-payload.schema.json",
+  "title": "Skeleton Descriptive Audit Memory Payload v1",
+  "description": "Tamper-evident descriptive governed-operation evidence without signer, callback, mutation, promotion, secret, prompt, transcript, scratchpad, or hidden-reasoning capability.",
+  "type": "object",
+  "additionalProperties": false,
+  "x-skeleton-sorted-inventories": [
+    "typed_input_ids",
+    "retrieved_source_ids",
+    "tool_argument_ids",
+    "structured_output_ids",
+    "error_ids",
+    "content_hashes"
+  ],
+  "x-skeleton-chain": {
+    "sequence": "sequence",
+    "previous_identity": "previous_audit_id",
+    "genesis_previous": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "x-skeleton-budget-pairs": [
+    ["budgets.items_used", "budgets.item_budget"],
+    ["budgets.bytes_used", "budgets.byte_budget"]
+  ],
+  "required": [
+    "schema_version",
+    "audit_id",
+    "sequence",
+    "previous_audit_id",
+    "operation_kind",
+    "operation_id",
+    "subject_id",
+    "typed_input_ids",
+    "retrieved_source_ids",
+    "tool_id",
+    "tool_version_id",
+    "tool_argument_ids",
+    "structured_output_ids",
+    "policy_result_id",
+    "error_ids",
+    "content_hashes",
+    "operation_result",
+    "uncertainty_class",
+    "budgets",
+    "rationale"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.audit-memory-payload.v1"},
+    "audit_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "sequence": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "previous_audit_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "operation_kind": {
+      "enum": [
+        "owner_authorization",
+        "tool_call",
+        "policy_decision",
+        "proposal",
+        "risk_result",
+        "execution_outcome",
+        "incident",
+        "restore"
+      ]
+    },
+    "operation_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "subject_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "typed_input_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+    "retrieved_source_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+    "tool_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/noneOrSha256"},
+    "tool_version_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/noneOrSha256"},
+    "tool_argument_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+    "structured_output_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+    "policy_result_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/noneOrSha256"},
+    "error_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+    "content_hashes": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+    "operation_result": {"enum": ["accepted", "denied", "observed", "completed", "failed", "restored"]},
+    "uncertainty_class": {"enum": ["none", "bounded", "material", "unresolved"]},
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item_budget", "byte_budget", "items_used", "bytes_used"],
+      "properties": {
+        "item_budget": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/positiveInteger"},
+        "byte_budget": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/positiveInteger"},
+        "items_used": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "bytes_used": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+      }
+    },
+    "rationale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["factor_codes", "conclusion_code", "summary", "uncertainty_class", "supporting_source_ids"],
+      "properties": {
+        "factor_codes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "x-skeleton-ordering": "lexicographic",
+          "items": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/identifier"}
+        },
+        "conclusion_code": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/identifier"},
+        "summary": {"type": "string", "minLength": 1, "maxLength": 512},
+        "uncertainty_class": {"enum": ["none", "bounded", "material", "unresolved"]},
+        "supporting_source_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"}
+      }
+    }
+  }
+}

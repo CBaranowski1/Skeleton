@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/deletion-execution.schema.json",
+  "title": "Skeleton Authorized Recoverable Deletion Execution v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "skeleton.deletion-execution.v1"},
+    "execution_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "preview_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "graph_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "pre_state_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "authorization": {},
+    "authorization_decision_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "reauthentication_proof_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "hold_verdict": {"enum": ["clear", "active", "unknown"]},
+    "backup_disposition": {"enum": ["destroy_authorized_copy", "retain_under_hold", "not_applicable", "unknown"]},
+    "recovery_state": {"enum": ["received", "in_progress", "incomplete", "terminal"]},
+    "items": {"type": "array"},
+    "completion_result": {},
+    "completed_result_sha256": {}
+  },
+  "allOf": [{"$ref": "#/$defs/completeExecution"}],
+  "$defs": {
+    "journalItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ordinal", "artifact_id", "content_sha256", "expected_path_sha256", "state", "recorded_at"],
+      "properties": {
+        "ordinal": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "artifact_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "content_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "expected_path_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "state": {"enum": ["pending", "delete_started", "absence_verified", "absence_recovered", "retained_hold"]},
+        "recorded_at": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?Z$"}
+      }
+    },
+    "terminalJournalItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ordinal", "artifact_id", "content_sha256", "expected_path_sha256", "state", "recorded_at"],
+      "properties": {
+        "ordinal": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "artifact_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "content_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "expected_path_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "state": {"enum": ["absence_verified", "absence_recovered", "retained_hold"]},
+        "recorded_at": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?Z$"}
+      }
+    },
+    "completeExecution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "execution_id", "preview_sha256", "graph_sha256", "pre_state_sha256", "authorization", "authorization_decision_sha256", "reauthentication_proof_sha256", "hold_verdict", "backup_disposition", "recovery_state", "items", "completion_result", "completed_result_sha256"],
+      "properties": {
+        "schema_version": {"const": "skeleton.deletion-execution.v1"},
+        "execution_id": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "preview_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "graph_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "pre_state_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "authorization": {
+          "allOf": [
+            {"$ref": "https://schemas.skeleton.local/v1/material-authorization.schema.json"},
+            {"properties": {"body": {"properties": {"action": {"const": "authorize"}, "scope": {"type": "string", "pattern": "^evidence-deletion\\.[0-9a-f]{64}$"}, "reauthentication_proof_sha256": {"type": "string", "pattern": "^(?!0{64}$)[0-9a-f]{64}$"}, "reversibility": {"const": "irreversible"}}}}}
+          ]
+        },
+        "authorization_decision_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "reauthentication_proof_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "hold_verdict": {"enum": ["clear", "active", "unknown"]},
+        "backup_disposition": {"enum": ["destroy_authorized_copy", "retain_under_hold", "not_applicable", "unknown"]},
+        "recovery_state": {"enum": ["received", "in_progress", "incomplete", "terminal"]},
+        "items": {"type": "array", "minItems": 1, "maxItems": 262144, "items": {"$ref": "#/$defs/journalItem"}},
+        "completion_result": {"oneOf": [{"$ref": "https://schemas.skeleton.local/v1/authority-result.schema.json"}, {"type": "null"}]},
+        "completed_result_sha256": {"oneOf": [{"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"}, {"type": "null"}]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"recovery_state": {"const": "terminal"}}, "required": ["recovery_state"]},
+          "then": {
+            "properties": {
+              "hold_verdict": {"const": "clear"},
+              "backup_disposition": {"enum": ["destroy_authorized_copy", "retain_under_hold", "not_applicable"]},
+              "items": {"type": "array", "minItems": 1, "maxItems": 262144, "items": {"$ref": "#/$defs/terminalJournalItem"}},
+              "completion_result": {
+                "allOf": [
+                  {"$ref": "https://schemas.skeleton.local/v1/authority-result.schema.json"},
+                  {"properties": {"signature_domain": {"const": "skeleton.authority-result.v1"}, "body": {"properties": {"authority_domain": {"const": "evidence-deletion"}, "disposition": {"const": "committed"}}}}}
+                ]
+              },
+              "completed_result_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"}
+            }
+          },
+          "else": {
+            "properties": {
+              "completion_result": {"type": "null"},
+              "completed_result_sha256": {"type": "null"}
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/metabolism-stage-receipt.schema.json",
+  "title": "Skeleton Metabolism Stage Receipt v1",
+  "description": "Append-only content-addressed receipt for one fixed-position pipeline stage of one metabolism cycle: ordinal-plus-input-snapshot cycle identity, fixed stage/ordinal binding, predecessor chain with an explicit genesis sentinel, and exact integer item counts; missing, reordered, or duplicated stages are unrepresentable.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE12_STAGE_RECEIPT_V1",
+  "$defs": {
+    "pipelineStage": {
+      "$ref": "https://schemas.skeleton.local/v1/compression-lineage.schema.json#/$defs/pipelineStage"
+    },
+    "nonGenesisSha256": {
+      "allOf": [
+        {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        {"not": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/genesisSha256"}}
+      ]
+    },
+    "receiptCommon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "stage_receipt_id",
+        "cycle_ordinal",
+        "cycle_input_root",
+        "fence_id",
+        "generation",
+        "attempt_ordinal",
+        "stage",
+        "stage_ordinal",
+        "prior_receipt_id",
+        "input_root",
+        "output_root",
+        "input_item_count",
+        "output_item_count"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.metabolism-stage-receipt.v1"},
+        "record_type": {"const": "stage_receipt"},
+        "stage_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "cycle_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "cycle_input_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+        "stage": {"$ref": "#/$defs/pipelineStage"},
+        "stage_ordinal": {"type": "integer", "minimum": 0, "maximum": 5},
+        "prior_receipt_id": {
+          "oneOf": [
+            {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/genesisSha256"},
+            {"$ref": "#/$defs/nonGenesisSha256"}
+          ]
+        },
+        "input_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "output_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "input_item_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+        "output_item_count": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "allOf": [
+        {"$ref": "#/$defs/receiptCommon"},
+        {
+          "properties": {
+            "stage": {"const": "lossless_deduplication"},
+            "stage_ordinal": {"const": 0},
+            "prior_receipt_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/genesisSha256"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/receiptCommon"},
+        {
+          "properties": {
+            "stage": {"const": "semantic_delta_encoding"},
+            "stage_ordinal": {"const": 1},
+            "prior_receipt_id": {"$ref": "#/$defs/nonGenesisSha256"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/receiptCommon"},
+        {
+          "properties": {
+            "stage": {"const": "prototype_exception_clustering"},
+            "stage_ordinal": {"const": 2},
+            "prior_receipt_id": {"$ref": "#/$defs/nonGenesisSha256"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/receiptCommon"},
+        {
+          "properties": {
+            "stage": {"const": "crystallization"},
+            "stage_ordinal": {"const": 3},
+            "prior_receipt_id": {"$ref": "#/$defs/nonGenesisSha256"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/receiptCommon"},
+        {
+          "properties": {
+            "stage": {"const": "retention_scoring"},
+            "stage_ordinal": {"const": 4},
+            "prior_receipt_id": {"$ref": "#/$defs/nonGenesisSha256"}
+          }
+        }
+      ]
+    },
+    {
+      "allOf": [
+        {"$ref": "#/$defs/receiptCommon"},
+        {
+          "properties": {
+            "stage": {"const": "pressure_pruning"},
+            "stage_ordinal": {"const": 5},
+            "prior_receipt_id": {"$ref": "#/$defs/nonGenesisSha256"}
+          }
+        }
+      ]
+    }
+  ]
+}

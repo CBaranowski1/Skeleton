@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/memory-rejection.schema.json",
+  "title": "Skeleton Non-Sensitive Memory Rejection v1",
+  "description": "Metadata-only pre-persistence safety rejection with no submitted content, detail, free-form error, authentication material, or suspected-secret-derived digest surface.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "rejection_id",
+    "source_event_id",
+    "category",
+    "detector_version",
+    "disposition",
+    "recorded_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.memory-rejection.v1"},
+    "rejection_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "source_event_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "category": {
+      "enum": [
+        "credential",
+        "authentication_material",
+        "private_key",
+        "recovery_secret",
+        "token",
+        "raw_prompt",
+        "transcript",
+        "scratchpad",
+        "hidden_reasoning"
+      ]
+    },
+    "detector_version": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/schemaVersion"},
+    "disposition": {"enum": ["rejected_before_persistence", "source_quarantined"]},
+    "recorded_at": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/utcTimestamp"}
+  }
+}

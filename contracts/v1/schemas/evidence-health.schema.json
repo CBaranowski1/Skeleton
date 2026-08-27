@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/evidence-health.schema.json",
+  "title": "Skeleton Redacted Evidence Health Snapshot v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "skeleton.evidence-health.v1"},
+    "snapshot_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "source_state_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+    "readiness": {"enum": ["ready", "degraded", "unknown", "unavailable"]},
+    "observed_at": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?Z$"},
+    "signals": {}
+  },
+  "allOf": [{"$ref": "#/$defs/completeSnapshot"}],
+  "$defs": {
+    "countSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "value", "reason_code"],
+      "properties": {
+        "state": {"enum": ["ready", "degraded", "unknown", "stale", "unavailable"]},
+        "value": {"oneOf": [{"type": "integer", "minimum": 0, "maximum": 9007199254740991}, {"type": "null"}]},
+        "reason_code": {"oneOf": [{"enum": ["threshold_exceeded", "evidence_missing", "evidence_stale", "evidence_corrupt", "evidence_partial"]}, {"type": "null"}]}
+      },
+      "allOf": [
+        {"if": {"properties": {"state": {"enum": ["ready", "degraded"]}}, "required": ["state"]}, "then": {"properties": {"value": {"type": "integer", "minimum": 0, "maximum": 9007199254740991}}}, "else": {"properties": {"value": {"type": "null"}, "reason_code": {"enum": ["evidence_missing", "evidence_stale", "evidence_corrupt", "evidence_partial"]}}}}
+      ]
+    },
+    "durationSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "value", "reason_code"],
+      "properties": {
+        "state": {"enum": ["ready", "degraded", "unknown", "stale", "unavailable"]},
+        "value": {"oneOf": [{"type": "integer", "minimum": 0, "maximum": 31536000}, {"type": "null"}]},
+        "reason_code": {"oneOf": [{"enum": ["threshold_exceeded", "evidence_missing", "evidence_stale", "evidence_corrupt", "evidence_partial"]}, {"type": "null"}]}
+      },
+      "allOf": [
+        {"if": {"properties": {"state": {"enum": ["ready", "degraded"]}}, "required": ["state"]}, "then": {"properties": {"value": {"type": "integer", "minimum": 0, "maximum": 31536000}}}, "else": {"properties": {"value": {"type": "null"}, "reason_code": {"enum": ["evidence_missing", "evidence_stale", "evidence_corrupt", "evidence_partial"]}}}}
+      ]
+    },
+    "ratioSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "value", "reason_code"],
+      "properties": {
+        "state": {"enum": ["ready", "degraded", "unknown", "stale", "unavailable"]},
+        "value": {"oneOf": [{"type": "integer", "minimum": 0, "maximum": 1000000}, {"type": "null"}]},
+        "reason_code": {"oneOf": [{"enum": ["threshold_exceeded", "evidence_missing", "evidence_stale", "evidence_corrupt", "evidence_partial"]}, {"type": "null"}]}
+      },
+      "allOf": [
+        {"if": {"properties": {"state": {"enum": ["ready", "degraded"]}}, "required": ["state"]}, "then": {"properties": {"value": {"type": "integer", "minimum": 0, "maximum": 1000000}}}, "else": {"properties": {"value": {"type": "null"}, "reason_code": {"enum": ["evidence_missing", "evidence_stale", "evidence_corrupt", "evidence_partial"]}}}}
+      ]
+    },
+    "signals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ingest_lag", "correction_rate", "sequence_gaps", "unresolved_identities", "exclusions", "rights_expiry", "deletion_backlog", "reproducibility_failures", "storage_pressure"],
+      "properties": {
+        "ingest_lag": {"$ref": "#/$defs/durationSignal"},
+        "correction_rate": {"$ref": "#/$defs/ratioSignal"},
+        "sequence_gaps": {"$ref": "#/$defs/countSignal"},
+        "unresolved_identities": {"$ref": "#/$defs/countSignal"},
+        "exclusions": {"$ref": "#/$defs/countSignal"},
+        "rights_expiry": {"$ref": "#/$defs/durationSignal"},
+        "deletion_backlog": {"$ref": "#/$defs/countSignal"},
+        "reproducibility_failures": {"$ref": "#/$defs/countSignal"},
+        "storage_pressure": {"$ref": "#/$defs/ratioSignal"}
+      }
+    },
+    "completeSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "snapshot_sha256", "source_state_sha256", "readiness", "observed_at", "signals"],
+      "properties": {
+        "schema_version": {"const": "skeleton.evidence-health.v1"},
+        "snapshot_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "source_state_sha256": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"},
+        "readiness": {"enum": ["ready", "degraded", "unknown", "unavailable"]},
+        "observed_at": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?Z$"},
+        "signals": {"$ref": "#/$defs/signals"}
+      }
+    }
+  }
+}

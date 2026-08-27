@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/plasticity-delta.schema.json",
+  "title": "Skeleton Content-Addressed Plasticity Delta v1",
+  "description": "The complete-or-unrepresentable D-06 fast-weight delta document: parent identity or the exact genesis sentinel, exactly one closed scope, the base-model snapshot identity it modifies, nonempty sorted evidence-gradient identities, a monotonic ordinal expiry that is never a timestamp, declared fixed-point int64 scale and rank, the tensor payload root, the inverse payload root, and the committed inverse-apply byte proof; applied, quarantined, and reversed states are separate activation documents, never mutations of this record, and a delta missing any member is schema-invalid.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE13_DELTA",
+  "x-skeleton-identity-rule": "delta_id = framed sha256 over JCS canonical bytes of the document with the delta_id member removed, under domain SKELETON_PHASE13_DELTA; the identity binds base_snapshot_id so an unknown, unpinned, or mismatched base snapshot rejects fail-closed (D-01)",
+  "x-skeleton-sorted-inventories": ["evidence_gradient_ids"],
+  "x-skeleton-cross-field": [
+    "inverse_proof.roundtrip_payload_root MUST equal inverse_proof.pre_apply_payload_root byte-for-byte (D-13)",
+    "expiry_ordinal is a monotonic ledger ordinal horizon, never wall-clock time (D-07)"
+  ],
+  "$defs": {
+    "nonGenesisSha256": {
+      "allOf": [
+        {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        {"not": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/genesisSha256"}}
+      ]
+    },
+    "fixedPointScale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["representation", "scale_log2"],
+      "properties": {
+        "representation": {"const": "fixed_point_int64"},
+        "scale_log2": {"type": "integer", "minimum": 0, "maximum": 62}
+      }
+    },
+    "inverseProof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proof_kind",
+        "pre_apply_payload_root",
+        "post_apply_payload_root",
+        "roundtrip_payload_root"
+      ],
+      "properties": {
+        "proof_kind": {"const": "inverse_apply_byte_identity"},
+        "pre_apply_payload_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "post_apply_payload_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+        "roundtrip_payload_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"}
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "schema_domain",
+    "delta_id",
+    "parent_delta_id",
+    "scope",
+    "base_snapshot_id",
+    "evidence_gradient_ids",
+    "expiry_ordinal",
+    "declared_scale",
+    "declared_rank",
+    "tensor_payload_root",
+    "inverse_payload_root",
+    "inverse_proof",
+    "payload_bytes",
+    "version_ordinal"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.plasticity-delta.v1"},
+    "record_type": {"const": "plasticity_delta"},
+    "schema_domain": {"const": "SKELETON_PHASE13_DELTA"},
+    "delta_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "parent_delta_id": {
+      "oneOf": [
+        {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/genesisSha256"},
+        {"$ref": "#/$defs/nonGenesisSha256"}
+      ]
+    },
+    "scope": {"$ref": "https://schemas.skeleton.local/v1/experience-gradient.schema.json#/$defs/scopeBinding"},
+    "base_snapshot_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "evidence_gradient_ids": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/nonemptyHashInventory"},
+    "expiry_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "declared_scale": {"$ref": "#/$defs/fixedPointScale"},
+    "declared_rank": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "tensor_payload_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "inverse_payload_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "inverse_proof": {"$ref": "#/$defs/inverseProof"},
+    "payload_bytes": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "version_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"}
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/legal-terms-record.schema.json",
+  "title": "Skeleton Legal Terms Record v1",
+  "description": "An immutable, content-addressed legal and terms interval for a named source.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "legal_terms_id",
+    "provider",
+    "jurisdiction",
+    "acquisition_method",
+    "automation_grant",
+    "effective_from",
+    "effective_to",
+    "terms_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "skeleton.legal-terms-record.v1"
+    },
+    "legal_terms_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "provider": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/identifier"
+    },
+    "jurisdiction": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 32,
+      "pattern": "^[A-Z][A-Z0-9]*(?:[-_][A-Z0-9]+)*$"
+    },
+    "acquisition_method": {
+      "enum": [
+        "documented_api",
+        "licensed_file",
+        "owner_download",
+        "provided_fixture",
+        "public_viewable",
+        "undocumented_endpoint"
+      ]
+    },
+    "automation_grant": {
+      "enum": [
+        "exact_recorded_automation",
+        "local_processing_only",
+        "prohibited"
+      ]
+    },
+    "effective_from": {
+      "$ref": "#/$defs/normalizedTimestamp"
+    },
+    "effective_to": {
+      "$ref": "#/$defs/normalizedTimestamp"
+    },
+    "recorded_at": {
+      "$ref": "#/$defs/normalizedTimestamp"
+    },
+    "terms_sha256": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "normalizedTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?Z$"
+    }
+  }
+}

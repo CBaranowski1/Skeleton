@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/market-conformance-trace.schema.json",
+  "title": "Market Conformance Trace v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "trace_id",
+    "family",
+    "initial_state",
+    "events",
+    "expected_verdict",
+    "expected_final_state",
+    "rejection_code"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "skeleton.market-conformance-trace.v1"
+    },
+    "trace_id": {
+      "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+    },
+    "family": {
+      "enum": [
+        "listed_option",
+        "future",
+        "contingent_contract",
+        "sports_event_contract"
+      ]
+    },
+    "initial_state": {
+      "type": "string",
+      "minLength": 1
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "event",
+          "evidence_id"
+        ],
+        "properties": {
+          "event": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_id": {
+            "$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"
+          },
+          "semantics": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "expected_multiplier": {"type": "string"},
+              "observed_multiplier": {"type": "string"},
+              "expected_tick": {"type": "string"},
+              "observed_tick": {"type": "string"},
+              "roll_available_at": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"},
+              "decision_time": {"$ref": "https://schemas.skeleton.local/v1/market-primitives.schema.json#/$defs/utcTimestamp"},
+              "requests_margin_authority": {"type": "boolean"},
+              "requires_fee_basis": {"type": "boolean"},
+              "fee_basis_id": {"type": ["string", "null"]},
+              "resolution_candidate_ids": {"type": "array", "items": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/sha256"}},
+              "requires_settlement_basis": {"type": "boolean"},
+              "settlement_basis_id": {"type": ["string", "null"]}
+            }
+          }
+        }
+      }
+    },
+    "expected_verdict": {
+      "enum": [
+        "accept",
+        "reject"
+      ]
+    },
+    "expected_final_state": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rejection_code": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

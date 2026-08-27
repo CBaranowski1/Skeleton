@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/memory-integrity.schema.json",
+  "title": "Skeleton Total Memory Integrity Run v1",
+  "description": "A sealed exact subject traversal with one closed terminal finding for every subject and no skipped reference class.",
+  "type": "object",
+  "additionalProperties": false,
+  "x-skeleton-sorted-inventories": ["subject_ids", "findings.subject_id"],
+  "x-skeleton-exact-counters": [
+    ["subject_count", "subject_ids"],
+    ["terminal_count", "findings"]
+  ],
+  "required": [
+    "schema_version",
+    "integrity_run_id",
+    "integrity_run_sha256",
+    "subject_manifest_id",
+    "subject_manifest_sha256",
+    "subject_ids",
+    "reference_manifests",
+    "findings",
+    "subject_count",
+    "healthy_count",
+    "exact_duplicate_count",
+    "contradiction_member_count",
+    "quarantined_count",
+    "terminal_count",
+    "completed_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.memory-integrity.v1"},
+    "integrity_run_id": {"$ref": "#/$defs/sha256"},
+    "integrity_run_sha256": {"$ref": "#/$defs/sha256"},
+    "subject_manifest_id": {"$ref": "#/$defs/sha256"},
+    "subject_manifest_sha256": {"$ref": "#/$defs/sha256"},
+    "subject_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/nonemptyHashInventory"},
+    "reference_manifests": {"$ref": "#/$defs/referenceManifests"},
+    "findings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "subject_id_lexicographic",
+      "items": {"$ref": "#/$defs/terminalFinding"}
+    },
+    "subject_count": {"$ref": "#/$defs/positiveInteger"},
+    "healthy_count": {"$ref": "#/$defs/safeInteger"},
+    "exact_duplicate_count": {"$ref": "#/$defs/safeInteger"},
+    "contradiction_member_count": {"$ref": "#/$defs/safeInteger"},
+    "quarantined_count": {"$ref": "#/$defs/safeInteger"},
+    "terminal_count": {"$ref": "#/$defs/positiveInteger"},
+    "completed_at": {"$ref": "#/$defs/timestamp"}
+  },
+  "$defs": {
+    "sha256": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "timestamp": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/utcTimestamp"},
+    "safeInteger": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "positiveInteger": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/positiveInteger"},
+    "defectCode": {
+      "enum": [
+        "missing_parent",
+        "missing_reference",
+        "duplicate_semantic_identity",
+        "contradictory_active_fact",
+        "invalid_correction_chain",
+        "invalid_audit_chain",
+        "unverifiable_bytes",
+        "scope_drift",
+        "rights_drift",
+        "impossible_time_order",
+        "working_set_terminal_invalid",
+        "retrieval_ledger_incomplete"
+      ]
+    },
+    "referenceKind": {
+      "enum": [
+        "memory",
+        "evidence",
+        "rights",
+        "lineage",
+        "procedure",
+        "model",
+        "audit",
+        "correction",
+        "contradiction",
+        "retrieval"
+      ]
+    },
+    "referenceManifests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_manifest_sha256",
+        "rights_manifest_sha256",
+        "lineage_manifest_sha256",
+        "procedure_manifest_sha256",
+        "model_manifest_sha256",
+        "audit_manifest_sha256"
+      ],
+      "properties": {
+        "evidence_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "rights_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "lineage_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "procedure_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "model_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "audit_manifest_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "healthyFinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding_id", "finding_sha256", "subject_id", "terminal_status"],
+      "properties": {
+        "finding_id": {"$ref": "#/$defs/sha256"},
+        "finding_sha256": {"$ref": "#/$defs/sha256"},
+        "subject_id": {"$ref": "#/$defs/sha256"},
+        "terminal_status": {"const": "healthy"}
+      }
+    },
+    "exactDuplicateFinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding_id", "finding_sha256", "subject_id", "terminal_status", "duplicate_of_subject_id"],
+      "properties": {
+        "finding_id": {"$ref": "#/$defs/sha256"},
+        "finding_sha256": {"$ref": "#/$defs/sha256"},
+        "subject_id": {"$ref": "#/$defs/sha256"},
+        "terminal_status": {"const": "exact_duplicate"},
+        "duplicate_of_subject_id": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "contradictionMemberFinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding_id", "finding_sha256", "subject_id", "terminal_status", "contradiction_set_id"],
+      "properties": {
+        "finding_id": {"$ref": "#/$defs/sha256"},
+        "finding_sha256": {"$ref": "#/$defs/sha256"},
+        "subject_id": {"$ref": "#/$defs/sha256"},
+        "terminal_status": {"const": "contradiction_member"},
+        "contradiction_set_id": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "quarantinedFinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_id",
+        "finding_sha256",
+        "subject_id",
+        "terminal_status",
+        "defect_code",
+        "reference_kind",
+        "reference_id"
+      ],
+      "properties": {
+        "finding_id": {"$ref": "#/$defs/sha256"},
+        "finding_sha256": {"$ref": "#/$defs/sha256"},
+        "subject_id": {"$ref": "#/$defs/sha256"},
+        "terminal_status": {"const": "quarantined"},
+        "defect_code": {"$ref": "#/$defs/defectCode"},
+        "reference_kind": {"$ref": "#/$defs/referenceKind"},
+        "reference_id": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "terminalFinding": {
+      "oneOf": [
+        {"$ref": "#/$defs/healthyFinding"},
+        {"$ref": "#/$defs/exactDuplicateFinding"},
+        {"$ref": "#/$defs/contradictionMemberFinding"},
+        {"$ref": "#/$defs/quarantinedFinding"}
+      ]
+    }
+  }
+}

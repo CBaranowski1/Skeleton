@@ -1,0 +1,21 @@
+[package]
+name = "skeleton-contracts"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "skeleton-contracts"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "=1.0.229", default-features = false, features = ["std"] }
+serde_json = { version = "=1.0.151", default-features = false, features = ["std"] }
+serde_json_canonicalizer = { version = "=0.3.2", default-features = false }
+ed25519-dalek = { version = "=3.0.0", default-features = false }
+jsonschema = { version = "=0.49.2", default-features = false }
+sha2 = { version = "=0.11.0", default-features = false }
+clap = { version = "=4.6.4", default-features = false, features = ["std"] }

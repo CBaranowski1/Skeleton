@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/memory-retrieval.schema.json",
+  "title": "Skeleton Complete Memory Retrieval Contract v1",
+  "description": "Closed compatibility query and sealed exactly-once considered-set result ledger; compatibility precedes stable ranking and budgets.",
+  "$defs": {
+    "sha256": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "identifier": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/identifier"},
+    "timestamp": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/utcTimestamp"},
+    "safeInteger": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "positiveInteger": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/positiveInteger"},
+    "rankProfile": {"const": "skeleton.memory-rank.v1"},
+    "exclusionReason": {
+      "enum": [
+        "unverifiable_bytes",
+        "quarantined",
+        "namespace_mismatch",
+        "project_mismatch",
+        "lobe_mismatch",
+        "future_available",
+        "not_yet_effective",
+        "expired",
+        "stale",
+        "purpose_kind_incompatible",
+        "scope_mismatch",
+        "operating_mode_mismatch",
+        "model_stage_mismatch",
+        "rights_unresolved",
+        "rights_revoked",
+        "rights_denied",
+        "provenance_rejected",
+        "quality_below_minimum",
+        "paper_seeded_test",
+        "paper_simulated",
+        "paper_synthetic",
+        "paper_contaminated",
+        "contradiction_integrity_invalid",
+        "budget_item",
+        "budget_bytes",
+        "budget_contradiction_group"
+      ]
+    },
+    "rankFactors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "purpose_rank",
+        "quality_rank",
+        "provenance_rank",
+        "effective_epoch_us",
+        "available_epoch_us",
+        "contradiction_group_id",
+        "rank_tie_breaker"
+      ],
+      "properties": {
+        "purpose_rank": {"$ref": "#/$defs/safeInteger"},
+        "quality_rank": {"$ref": "#/$defs/safeInteger"},
+        "provenance_rank": {"$ref": "#/$defs/safeInteger"},
+        "effective_epoch_us": {"$ref": "#/$defs/safeInteger"},
+        "available_epoch_us": {"$ref": "#/$defs/safeInteger"},
+        "contradiction_group_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/noneOrSha256"},
+        "rank_tie_breaker": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "includedItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["memory_id", "disposition", "rank_factors", "canonical_byte_count"],
+      "properties": {
+        "memory_id": {"$ref": "#/$defs/sha256"},
+        "disposition": {"const": "included"},
+        "rank_factors": {"$ref": "#/$defs/rankFactors"},
+        "canonical_byte_count": {"$ref": "#/$defs/positiveInteger"}
+      }
+    },
+    "excludedItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["memory_id", "disposition", "exclusion_reason"],
+      "properties": {
+        "memory_id": {"$ref": "#/$defs/sha256"},
+        "disposition": {"const": "excluded"},
+        "exclusion_reason": {"$ref": "#/$defs/exclusionReason"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "x-skeleton-sorted-inventories": ["accepted_provenance_classes"],
+      "required": [
+        "schema_version",
+        "record_type",
+        "query_id",
+        "candidate_snapshot_id",
+        "decision_at",
+        "known_at",
+        "world_at",
+        "namespace",
+        "lobe_id",
+        "project_id",
+        "purpose",
+        "scope",
+        "operating_mode",
+        "rights_boundary",
+        "minimum_quality",
+        "accepted_provenance_classes",
+        "model_stage",
+        "paper_eligible",
+        "item_budget",
+        "byte_budget",
+        "rank_profile_id",
+        "integrity_snapshot_id"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.memory-retrieval.v1"},
+        "record_type": {"const": "query"},
+        "query_id": {"$ref": "#/$defs/sha256"},
+        "candidate_snapshot_id": {"$ref": "#/$defs/sha256"},
+        "decision_at": {"$ref": "#/$defs/timestamp"},
+        "known_at": {"$ref": "#/$defs/timestamp"},
+        "world_at": {"$ref": "#/$defs/timestamp"},
+        "namespace": {"$ref": "#/$defs/identifier"},
+        "lobe_id": {"$ref": "#/$defs/identifier"},
+        "project_id": {"$ref": "#/$defs/identifier"},
+        "purpose": {"$ref": "#/$defs/identifier"},
+        "scope": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/scope"},
+        "operating_mode": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/operatingMode"},
+        "rights_boundary": {"const": "retrieval"},
+        "minimum_quality": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/qualityClass"},
+        "accepted_provenance_classes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "x-skeleton-ordering": "lexicographic",
+          "items": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/provenanceClass"}
+        },
+        "model_stage": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/modelStage"},
+        "paper_eligible": {"type": "boolean"},
+        "item_budget": {"$ref": "#/$defs/positiveInteger"},
+        "byte_budget": {"$ref": "#/$defs/positiveInteger"},
+        "rank_profile_id": {"$ref": "#/$defs/rankProfile"},
+        "integrity_snapshot_id": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "x-skeleton-sorted-inventories": ["included_ids", "considered_items.memory_id"],
+      "x-skeleton-exact-counters": [
+        ["candidate_count", "considered_items"],
+        ["included_count", "included_ids"],
+        ["used_items", "included_ids"]
+      ],
+      "x-skeleton-budget-pairs": [
+        ["used_items", "item_budget"],
+        ["used_bytes", "byte_budget"]
+      ],
+      "required": [
+        "schema_version",
+        "record_type",
+        "result_id",
+        "query_id",
+        "query_sha256",
+        "candidate_snapshot_id",
+        "candidate_snapshot_sha256",
+        "integrity_snapshot_id",
+        "integrity_snapshot_sha256",
+        "rank_profile_id",
+        "rank_profile_sha256",
+        "result_sha256",
+        "ledger_sha256",
+        "included_ids",
+        "considered_items",
+        "candidate_count",
+        "included_count",
+        "excluded_count",
+        "item_budget",
+        "byte_budget",
+        "used_items",
+        "used_bytes"
+      ],
+      "properties": {
+        "schema_version": {"const": "skeleton.memory-retrieval.v1"},
+        "record_type": {"const": "result"},
+        "result_id": {"$ref": "#/$defs/sha256"},
+        "query_id": {"$ref": "#/$defs/sha256"},
+        "query_sha256": {"$ref": "#/$defs/sha256"},
+        "candidate_snapshot_id": {"$ref": "#/$defs/sha256"},
+        "candidate_snapshot_sha256": {"$ref": "#/$defs/sha256"},
+        "integrity_snapshot_id": {"$ref": "#/$defs/sha256"},
+        "integrity_snapshot_sha256": {"$ref": "#/$defs/sha256"},
+        "rank_profile_id": {"$ref": "#/$defs/rankProfile"},
+        "rank_profile_sha256": {"$ref": "#/$defs/sha256"},
+        "result_sha256": {"$ref": "#/$defs/sha256"},
+        "ledger_sha256": {"$ref": "#/$defs/sha256"},
+        "included_ids": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/hashInventory"},
+        "considered_items": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "x-skeleton-ordering": "memory_id_lexicographic",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/$defs/includedItem"},
+              {"$ref": "#/$defs/excludedItem"}
+            ]
+          }
+        },
+        "candidate_count": {"$ref": "#/$defs/positiveInteger"},
+        "included_count": {"$ref": "#/$defs/safeInteger"},
+        "excluded_count": {"$ref": "#/$defs/safeInteger"},
+        "item_budget": {"$ref": "#/$defs/positiveInteger"},
+        "byte_budget": {"$ref": "#/$defs/positiveInteger"},
+        "used_items": {"$ref": "#/$defs/safeInteger"},
+        "used_bytes": {"$ref": "#/$defs/safeInteger"}
+      }
+    }
+  ]
+}

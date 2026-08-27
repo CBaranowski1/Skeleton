@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/memory-derived-artifact.schema.json",
+  "title": "Skeleton Rebuildable Derived-Artifact Registration v1",
+  "description": "Registration of one rebuildable non-authoritative derived artifact: six closed classes, builder version, sorted unique authoritative source roots, output root, and required non-authority and rebuildable constants so no derived artifact can ever be declared authoritative or hold the sole copy of a fact.",
+  "x-skeleton-append-only": true,
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE12_DERIVED_ARTIFACT_V1",
+  "x-skeleton-sorted-inventories": ["source_root_ids"],
+  "$defs": {
+    "artifactClass": {
+      "enum": [
+        "embedding",
+        "index",
+        "summary",
+        "cache",
+        "density_field",
+        "hidden_state"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "derived_artifact_id",
+    "cycle_ordinal",
+    "cycle_input_root",
+    "fence_id",
+    "generation",
+    "attempt_ordinal",
+    "artifact_class",
+    "builder_version",
+    "builder_code_sha256",
+    "source_root_ids",
+    "output_root",
+    "authority_input",
+    "rebuildable"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.memory-derived-artifact.v1"},
+    "record_type": {"const": "derived_artifact_registration"},
+    "derived_artifact_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "cycle_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "cycle_input_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "fence_id": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "generation": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/safeNonnegativeInteger"},
+    "attempt_ordinal": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/positiveInteger"},
+    "artifact_class": {"$ref": "#/$defs/artifactClass"},
+    "builder_version": {"$ref": "https://schemas.skeleton.local/v1/primitives.schema.json#/$defs/schemaVersion"},
+    "builder_code_sha256": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "source_root_ids": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/nonemptyHashInventory"},
+    "output_root": {"$ref": "https://schemas.skeleton.local/v1/agent-primitives.schema.json#/$defs/sha256"},
+    "authority_input": {"const": false},
+    "rebuildable": {"const": true}
+  }
+}

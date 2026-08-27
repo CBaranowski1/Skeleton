@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.skeleton.local/v1/memory-capsule.schema.json",
+  "title": "Skeleton Closed Twelve-Field Memory Capsule v1",
+  "description": "The closed canonical MEM-14 capsule: prior state, prediction, alternatives, action, outcome, surprise, changed beliefs, falsifier, provenance, privacy scope, interpreting model, and compression lineage; free-form extensions, raw prompts, transcripts, hidden reasoning, and credential material are unrepresentable by shape.",
+  "x-skeleton-authority-free": true,
+  "x-skeleton-identity-domain": "SKELETON_PHASE12_CAPSULE_V1",
+  "x-skeleton-identity-rule": "capsule_id = framed sha256 over JCS canonical bytes of the document with the capsule_id member removed, under domain SKELETON_PHASE12_CAPSULE_V1, following memory_contracts.compute_document_identity",
+  "x-skeleton-sorted-inventories": ["alternatives", "changed_beliefs"],
+  "$defs": {
+    "boundedText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "absentText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["present"],
+      "properties": {
+        "present": {"const": false}
+      }
+    },
+    "presentText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["present", "text"],
+      "properties": {
+        "present": {"const": true},
+        "text": {"$ref": "#/$defs/boundedText"}
+      }
+    },
+    "optionalText": {
+      "oneOf": [
+        {"$ref": "#/$defs/absentText"},
+        {"$ref": "#/$defs/presentText"}
+      ]
+    },
+    "boundedTextInventory": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "x-skeleton-ordering": "lexicographic",
+      "items": {"$ref": "#/$defs/boundedText"}
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "capsule_id",
+    "state_before",
+    "prediction",
+    "alternatives",
+    "action",
+    "outcome",
+    "surprise",
+    "changed_beliefs",
+    "falsifier",
+    "provenance_class",
+    "privacy_scope",
+    "interpreting_model_id",
+    "lineage_id"
+  ],
+  "properties": {
+    "schema_version": {"const": "skeleton.memory-capsule.v1"},
+    "capsule_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "state_before": {"$ref": "#/$defs/boundedText"},
+    "prediction": {"$ref": "#/$defs/optionalText"},
+    "alternatives": {"$ref": "#/$defs/boundedTextInventory"},
+    "action": {"$ref": "#/$defs/boundedText"},
+    "outcome": {"$ref": "#/$defs/optionalText"},
+    "surprise": {"$ref": "#/$defs/optionalText"},
+    "changed_beliefs": {"$ref": "#/$defs/boundedTextInventory"},
+    "falsifier": {"$ref": "#/$defs/boundedText"},
+    "provenance_class": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/provenanceClass"},
+    "privacy_scope": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/scope"},
+    "interpreting_model_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"},
+    "lineage_id": {"$ref": "https://schemas.skeleton.local/v1/memory-primitives.schema.json#/$defs/sha256"}
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "prediction": {"$ref": "#/$defs/presentText"},
+        "outcome": {"$ref": "#/$defs/presentText"}
+      }
+    },
+    {
+      "properties": {
+        "surprise": {"$ref": "#/$defs/absentText"}
+      },
+      "anyOf": [
+        {"properties": {"prediction": {"$ref": "#/$defs/absentText"}}},
+        {"properties": {"outcome": {"$ref": "#/$defs/absentText"}}}
+      ]
+    }
+  ]
+}

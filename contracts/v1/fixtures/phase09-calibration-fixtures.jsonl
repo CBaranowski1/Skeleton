@@ -1,0 +1,5 @@
+{"calibration_eligible":true,"expected_verdict":"accept","family":"listed_cash_equity","id":"calibration-listed-cash-equity-admitted","observation_scope":"admitted_only"}
+{"calibration_eligible":true,"expected_verdict":"accept","family":"listed_option","id":"calibration-listed-option-admitted","observation_scope":"admitted_only"}
+{"calibration_eligible":true,"expected_verdict":"accept","family":"future","id":"calibration-future-admitted","observation_scope":"admitted_only"}
+{"calibration_eligible":true,"expected_verdict":"accept","family":"contingent_contract","id":"calibration-contingent-contract-admitted","observation_scope":"admitted_only"}
+{"calibration_eligible":true,"expected_verdict":"accept","family":"sports_event_contract","id":"calibration-sports-event-contract-admitted","observation_scope":"admitted_only"}
