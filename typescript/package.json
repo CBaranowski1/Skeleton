@@ -13,10 +13,10 @@
     "test": "node --test --test-reporter=spec test/conformance.test.ts"
   },
   "dependencies": {
-    "canonicalize": "3.0.0"
+    "canonicalize": "4.0.0"
   },
   "devDependencies": {
-    "@types/node": "26.1.2",
+    "@types/node": "26.4.0",
     "@typescript/typescript-win32-x64": "7.0.2"
   }
 }
